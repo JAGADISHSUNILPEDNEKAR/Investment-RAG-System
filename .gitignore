@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Local Database
+chroma_db/
+
+# Streamlit
+.streamlit/
+
+# OS
+.DS_Store
+Thumbs.db
