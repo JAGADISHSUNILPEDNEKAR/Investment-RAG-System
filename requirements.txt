@@ -1,0 +1,11 @@
+streamlit
+langchain==0.3.13
+langchain-community==0.3.13
+langchain-core==0.3.63
+langchain-text-splitters==0.3.8
+langchain-huggingface
+langchain-google-genai
+pypdf
+chromadb
+sentence-transformers
+python-dotenv
