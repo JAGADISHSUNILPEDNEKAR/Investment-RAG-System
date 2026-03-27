@@ -175,7 +175,7 @@ def get_embeddings():
 
 @st.cache_resource
 def get_llm():
-    return ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.2)
+    return ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.2)
 
 embeddings = get_embeddings()
 DB_DIR = "./chroma_db"
