@@ -363,7 +363,7 @@ elif st.session_state.active_tab == "Dashboard":
         if q_in and os.path.exists(DB_DIR):
             with st.spinner("Thinking..."):
                 vs = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
-                chain = create_retrieval_chain(vs.as_retriever(), create_stuff_documents_chain(get_llm(), ChatPromptTemplate.from_messages([("system", "Answer with context: \n\n{{context}}"), ("human", "{{input}}")])))
+                chain = create_retrieval_chain(vs.as_retriever(), create_stuff_documents_chain(get_llm(), ChatPromptTemplate.from_messages([("system", "Answer with context: \n\n{context}"), ("human", "{input}")])))
                 st.session_state.ans = chain.invoke({"input": q_in})
         elif not os.path.exists(DB_DIR): st.error("Upload first.")
     
