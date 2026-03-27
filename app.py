@@ -108,7 +108,7 @@ tailwind.config = {
         max-width: 100% !important;
     }
     
-    [data-testid="stHeader"] { display: none !important; }
+    /* [data-testid="stHeader"] { display: none !important; } */
     #MainMenu { visibility: hidden; }
 
     /* Docked Sidebar */
