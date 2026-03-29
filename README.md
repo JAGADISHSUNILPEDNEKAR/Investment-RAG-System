@@ -57,6 +57,18 @@ A functional Retrieval-Augmented Generation (RAG) system built with Streamlit fo
 2. **Verify**: Check the "Backend Verification" tab to see how text is converted into chunks and vectors.
 3. **Query**: Ask complex investment questions in the "Live Querying" tab to get context-aware answers.
 
+## 🔍 Diagnostics & Testing
+A few diagnostic scripts are available in the `tests/` directory to verify system connectivity and model availability:
+
+- `tests/test_models.py`: Lists all models available to your Google API key.
+- `tests/test_langchain.py`: Verifies LangChain's integration with Gemini.
+- `tests/test_quota.py`: Tests multiple models to find the first one that works within your quota.
+
+To run a test, use:
+```bash
+python tests/<test_script_name>.py
+```
+
 ## 👤 Author
 - **Name**: Jagadish Sunil Pednekar
 - **Instructor**: Achint Setia
