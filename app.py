@@ -414,22 +414,34 @@ elif st.session_state.active_tab == "Verify DB":
 
 elif st.session_state.active_tab == "Dashboard":
     st.markdown("""
-    <div class="space-y-8">
-        <div class="space-y-2">
-            <h2 class="text-3xl font-extrabold font-headline tracking-tighter text-[#dee5ff]">Intelligent Query</h2>
-            <p class="text-[#a3aac4] text-lg">Probe the cognitive architecture of the investment literature with precise inquiries.</p>
+    <div class="space-y-10">
+        <div class="space-y-3">
+            <div class="flex items-center gap-3">
+                <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold tracking-[0.2em] rounded-full uppercase">Cognitive Layer</span>
+            </div>
+            <h1 class="text-5xl font-black font-headline tracking-tight text-white leading-tight">Intelligent Query</h1>
+            <p class="text-slate-400 text-lg max-w-2xl font-medium">Probe the latent space of your ingested documents with precise, natural language inquiries.</p>
         </div>
     """, unsafe_allow_html=True)
     
-    q_in = st.text_input("Ask...", placeholder="Ask anything about the investment documents...", label_visibility="collapsed")
+    # Custom Query Input Styling
+    st.markdown("""
+    <div class="relative group mt-8">
+        <div class="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-500"></div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    if st.button("Query AI", key="btn_q"):
-        if q_in and os.path.exists(DB_DIR):
-            with st.spinner("Thinking..."):
-                vs = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
-                chain = create_retrieval_chain(vs.as_retriever(), create_stuff_documents_chain(get_llm(), ChatPromptTemplate.from_messages([("system", "Answer with context: \n\n{context}"), ("human", "{input}")])))
-                st.session_state.ans = chain.invoke({"input": q_in})
-        elif not os.path.exists(DB_DIR): st.error("Upload first.")
+    q_in = st.text_input("Ask...", placeholder="What are the key risk factors mentioned in the portfolio report?", label_visibility="collapsed")
+    
+    q_cols = st.columns([1, 4, 1])
+    with q_cols[1]:
+        if st.button("Execute Neural Search", key="btn_q", use_container_width=True):
+            if q_in and os.path.exists(DB_DIR):
+                with st.spinner("Synthesizing Insights..."):
+                    vs = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
+                    chain = create_retrieval_chain(vs.as_retriever(), create_stuff_documents_chain(get_llm(), ChatPromptTemplate.from_messages([("system", "Answer with context: \n\n{context}"), ("human", "{input}")])))
+                    st.session_state.ans = chain.invoke({"input": q_in})
+            elif not os.path.exists(DB_DIR): st.error("No knowledge base found. Please ingest documents first.")
     
     if "ans" in st.session_state:
         res = st.session_state.ans
@@ -438,57 +450,73 @@ elif st.session_state.active_tab == "Dashboard":
         sources_html = ""
         for i, doc in enumerate(res["context"][:2]):
             sources_html += f"""
-            <div class="flex gap-4 p-5 bg-[#192540]/40 rounded-xl border border-white/5 hover:border-[#9fa7ff]/30 transition-all">
-                <span class="font-label text-[#ffa5d9] font-bold text-sm">SOURCE [{i+1}]</span>
-                <p class="text-sm italic text-[#a3aac4] leading-relaxed">"{doc.page_content[:280]}..."</p>
+            <div class="glass-card p-6 border-l-2 border-l-primary/30 hover:border-l-primary transition-all">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Context node {i+1}</span>
+                    <div class="h-px flex-grow bg-white/5"></div>
+                </div>
+                <p class="text-sm italic text-slate-400 leading-relaxed font-medium">"{doc.page_content[:320]}..."</p>
             </div>
             """
 
         # Full Results Block
         st.markdown(f"""
-        <section class="bg-[#091328] rounded-2xl p-8 lg:p-12 space-y-12 border border-white/5 mt-12 shadow-2xl">
-            <div class="flex items-center gap-4 text-[#9fa7ff]">
-                <div class="w-12 h-12 bg-[#9fa7ff]/10 rounded-full flex items-center justify-center">
-                    <span class="material-symbols-outlined text-2xl">analytics</span>
+        <div class="glass-card p-10 lg:p-16 space-y-16 mt-16 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10"></div>
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <div class="flex items-center gap-5">
+                    <div class="w-16 h-16 bg-primary rounded-3xl flex items-center justify-center text-slate-950 shadow-2xl shadow-primary/20 rotate-6">
+                        <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">insights</span>
+                    </div>
+                    <div>
+                        <h3 class="font-headline text-3xl font-black text-white tracking-tight">Synthesis Report</h3>
+                        <p class="text-slate-400 font-medium">Generated from multidimensional vector retrieval</p>
+                    </div>
                 </div>
-                <h3 class="font-headline text-3xl font-bold tracking-tight">Synthesis Report</h3>
+                <div class="flex gap-3">
+                    <div class="px-4 py-2 bg-slate-900 rounded-xl border border-white/5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">v2.4 STABLE</div>
+                </div>
             </div>
             
-            <div class="space-y-6">
-                <div class="flex items-center gap-3">
-                    <div class="h-[1px] flex-grow bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
-                    <p class="font-label text-[10px] uppercase tracking-[0.3em] text-[#a3aac4] font-bold">Retrieved Reasoning Nodes</p>
-                    <div class="h-[1px] flex-grow bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+            <div class="space-y-8">
+                <div class="flex items-center gap-4">
+                    <p class="font-label text-[10px] uppercase tracking-[0.4em] text-primary font-black whitespace-nowrap">Retrieved Context</p>
+                    <div class="h-px w-full bg-gradient-to-r from-primary/20 to-transparent"></div>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {sources_html}
                 </div>
             </div>
 
-            <div class="pt-12 border-t border-white/5 relative">
-                <div class="absolute -top-4 left-0 bg-[#060e20] px-5 py-1.5 text-[10px] font-label font-bold text-[#9fa7ff] border border-[#9fa7ff]/30 rounded-full flex items-center gap-2">
+            <div class="pt-16 border-t border-white/5 relative">
+                <div class="absolute -top-5 left-0 bg-slate-950 px-6 py-2 text-[10px] font-black text-primary border border-primary/30 rounded-full flex items-center gap-3">
                     <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9fa7ff] opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-[#9fa7ff]"></span>
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                     </span>
-                    FINAL ANALYSIS GENERATED
+                    ANALYSIS FINALIZED
                 </div>
-                <div class="prose prose-invert max-w-none text-xl leading-relaxed text-[#dee5ff]/90 font-body">
-                    {res["answer"]}
+                <div class="prose prose-invert max-w-none">
+                    <div class="text-xl leading-relaxed text-slate-200 font-medium font-body opacity-95">
+                        {res["answer"]}
+                    </div>
                 </div>
             </div>
             
-            <div class="mt-12 flex flex-wrap gap-4 pt-6">
-                <button class="flex items-center gap-3 text-sm font-bold text-[#101b8b] px-6 py-3 rounded-xl bg-[#9fa7ff] hover:bg-[#8d98ff] transition-all transform active:scale-95 shadow-lg shadow-[#9fa7ff]/10">
-                    <span class="material-symbols-outlined text-sm">file_download</span> Export Full Analysis
+            <div class="mt-16 flex flex-wrap gap-4 pt-10 border-t border-white/5">
+                <button class="bg-primary hover:bg-primary-600 text-slate-950 font-bold px-8 py-4 rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/10 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-xl">file_download</span> 
+                    <span>Export Analysis</span>
                 </button>
-                <button class="flex items-center gap-3 text-sm font-bold text-[#a3aac4] px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all active:scale-95">
-                    <span class="material-symbols-outlined text-sm">share</span> Share Core Insights
+                <button class="bg-white/5 hover:bg-white/10 text-white font-bold px-8 py-4 rounded-2xl border border-white/10 transition-all active:scale-95 flex items-center gap-3">
+                    <span class="material-symbols-outlined text-xl">share</span> 
+                    <span>Share Insights</span>
                 </button>
             </div>
-        </section>
+        </div>
         """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True) # Closes space-y-8
+    st.markdown("</div>", unsafe_allow_html=True) # Closes space-y-10
 
 st.markdown('</div>', unsafe_allow_html=True)
 
