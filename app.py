@@ -235,7 +235,7 @@ def get_google_api_key():
 def get_llm():
     api_key = get_google_api_key()
     return ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash-latest", 
+        model="gemini-1.5-flash", 
         temperature=0.2,
         google_api_key=api_key
     )
