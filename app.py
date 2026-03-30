@@ -266,40 +266,53 @@ if st.session_state.active_tab == "Retriever":
         """, unsafe_allow_html=True)
 
     with r_cols[1]:
+        # Build Document Status HTML
+        status_text = "File selected" if uploaded_file else "No file selected"
+        file_size = (uploaded_file.size/1024/1024) if uploaded_file else 0
+        
         st.markdown(f"""
-        <div class="bg-[#0f1930] p-8 rounded-xl flex flex-col justify-between h-full">
-            <div class="space-y-4">
+        <div class="bg-[#0f1930] p-8 rounded-xl flex flex-col justify-between h-full border border-white/5">
+            <div class="space-y-6">
                 <div class="flex items-start justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-[#a70138]/20 text-[#ff6e84] rounded flex items-center justify-center">
-                            <span class="material-symbols-outlined">picture_as_pdf</span>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-[#a70138]/20 text-[#ff6e84] rounded-xl flex items-center justify-center shadow-lg">
+                            <span class="material-symbols-outlined text-2xl">picture_as_pdf</span>
                         </div>
                         <div>
-                            <p class="font-bold text-[#dee5ff] text-sm truncate w-32">{"File selected" if uploaded_file else "No file selected"}</p>
-                            <p class="text-[10px] font-label text-slate-500">{(uploaded_file.size/1024/1024) if uploaded_file else 0:.1f} MB</p>
+                            <p class="font-bold text-[#dee5ff] text-base truncate w-40">{status_text}</p>
+                            <p class="text-[10px] font-label text-slate-500 uppercase tracking-widest">{file_size:.1f} MB • PDF ARCHIVE</p>
                         </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <div class="flex justify-between text-[10px] font-label text-slate-400">
+                        <span>PROCESSING ENGINE</span>
+                        <span>v2.4 STABLE</span>
+                    </div>
+                    <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full bg-[#9fa7ff] w-1/3 opacity-50"></div>
                     </div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
-        if uploaded_file and st.button("Process Document", key="btn_p"):
-            with st.spinner("Analyzing..."):
+
+        if uploaded_file and st.button("Initialize Neural Index", key="btn_p"):
+            with st.spinner("Analyzing Document Topology..."):
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
                     tmp.write(uploaded_file.getvalue()); tmp_path = tmp.name
                 try:
                     loader = PyPDFLoader(tmp_path); docs = loader.load()
                     splits = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200).split_documents(docs)
                     Chroma.from_documents(documents=splits, embedding=embeddings, persist_directory=DB_DIR)
-                    st.session_state.process_status = "READY"; st.success("Indexing Complete")
+                    st.session_state.process_status = "READY"; st.success("Neural Indexing Complete")
                 finally: os.unlink(tmp_path)
         
         st.markdown("""
-        <button class="w-full bg-[#1f2b49] text-[#9fa7ff] font-bold py-3 rounded-lg hover:bg-[#9fa7ff] hover:text-[#101b8b] transition-all active:scale-95 mt-4">
-            Process Document (Click above button)
-        </button>
+            <p class="text-[10px] text-[#a3aac4] mt-6 italic text-center opacity-60">Click above to start RAG indexing</p>
         </div>
         """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True) # Closes space-y-12
 
 elif st.session_state.active_tab == "Verify DB":
     st.markdown("""
@@ -320,44 +333,55 @@ elif st.session_state.active_tab == "Verify DB":
                 data = collection.get(include=['documents', 'embeddings'], limit=3)
                 v_cols = st.columns(2, gap="large")
                 with v_cols[0]:
-                    st.markdown("""
-                    <div class="bg-[#091328] rounded-xl overflow-hidden border border-white/5">
+                    chunks_html = ""
+                    for doc in data['documents']:
+                        chunks_html += f'<div class="p-4 bg-[#0f1930] rounded-lg border-l-4 border-[#9fa7ff] text-sm text-[#a3aac4] shadow-sm italic leading-relaxed">"{doc[:220]}..."</div>'
+                    
+                    st.markdown(f"""
+                    <div class="bg-[#091328] rounded-xl overflow-hidden border border-white/5 shadow-xl">
                         <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-[#192540]/30">
-                            <span class="font-headline font-bold text-sm flex items-center gap-2">
-                                <span class="material-symbols-outlined text-[#7f8af6] text-sm">segment</span>
-                                Chunks ({n})
+                            <span class="font-headline font-bold text-sm flex items-center gap-3">
+                                <span class="material-symbols-outlined text-[#7f8af6]">segment</span>
+                                Document Chunks ({len(data['documents'])})
                             </span>
                         </div>
-                        <div class="p-4 space-y-4">
-                    """.format(n=len(data['documents'])), unsafe_allow_html=True)
-                    for doc in data['documents']: 
-                        st.markdown(f'<div class="p-4 bg-[#0f1930] rounded-lg border-l-4 border-[#9fa7ff] text-sm text-[#a3aac4]">"{doc[:200]}..."</div>', unsafe_allow_html=True)
-                    st.markdown('</div>', unsafe_allow_html=True)
-                with v_cols[1]:
-                    st.markdown("""
-                    <div class="bg-[#091328] rounded-xl overflow-hidden border border-white/5">
-                        <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-[#192540]/30">
-                            <span class="font-headline font-bold text-sm flex items-center gap-2">
-                                <span class="material-symbols-outlined text-[#c180ff] text-sm">grid_3x3</span>
-                                Embeddings (d=384)
-                            </span>
+                        <div class="p-5 space-y-4">
+                            {chunks_html}
                         </div>
-                        <div class="p-4 space-y-4 font-label text-[10px]">
+                    </div>
                     """, unsafe_allow_html=True)
-                    for emb in data['embeddings']: 
-                        st.markdown(f'<div class="p-4 bg-[#000000] rounded-lg border border-white/5 text-[#7f8af6]/80 break-all leading-tight">[{", ".join([f"{x:.2f}" for x in emb[:8]])}...]</div>', unsafe_allow_html=True)
-                    st.markdown('</div>', unsafe_allow_html=True)
+                
+                with v_cols[1]:
+                    embeddings_html = ""
+                    for emb in data['embeddings']:
+                        embeddings_html += f'<div class="p-4 bg-[#000000] rounded-lg border border-white/5 text-[#7f8af6]/80 break-all leading-tight font-mono text-[9px] shadow-inner">[{", ".join([f"{x:.2f}" for x in emb[:12]])}...]</div>'
+                    
+                    st.markdown(f"""
+                    <div class="bg-[#091328] rounded-xl overflow-hidden border border-white/5 shadow-xl">
+                        <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-[#192540]/30">
+                            <span class="font-headline font-bold text-sm flex items-center gap-3">
+                                <span class="material-symbols-outlined text-[#c180ff]">grid_3x3</span>
+                                High-Dim Vectors (d=384)
+                            </span>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            {embeddings_html}
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
         except Exception as e: st.error(f"Error: {e}")
     else: st.info("Index not found.")
 
 elif st.session_state.active_tab == "Dashboard":
     st.markdown("""
-    <div class="space-y-6">
-        <h2 class="text-2xl font-extrabold font-headline tracking-tighter text-[#dee5ff]">Intelligent Query</h2>
-        <div class="relative">
+    <div class="space-y-8">
+        <div class="space-y-2">
+            <h2 class="text-3xl font-extrabold font-headline tracking-tighter text-[#dee5ff]">Intelligent Query</h2>
+            <p class="text-[#a3aac4] text-lg">Probe the cognitive architecture of the investment literature with precise inquiries.</p>
+        </div>
     """, unsafe_allow_html=True)
     
-    q_in = st.text_input("Ask...", placeholder="Ask anything about the investment book...", label_visibility="collapsed")
+    q_in = st.text_input("Ask...", placeholder="Ask anything about the investment documents...", label_visibility="collapsed")
     
     if st.button("Query AI", key="btn_q"):
         if q_in and os.path.exists(DB_DIR):
@@ -369,47 +393,62 @@ elif st.session_state.active_tab == "Dashboard":
     
     if "ans" in st.session_state:
         res = st.session_state.ans
-        st.markdown(f"""
-        <section class="bg-[#091328] rounded-xl p-8 lg:p-12 space-y-10 border border-white/5 mt-12">
-            <div class="flex items-center gap-4 text-[#9fa7ff]">
-                <span class="material-symbols-outlined">help_center</span>
-                <h3 class="font-headline text-2xl font-bold">Analysis Results</h3>
-            </div>
-            
-            <div class="space-y-4">
-                <p class="font-label text-xs uppercase tracking-widest text-[#a3aac4]">Retrieved Sources (RAG Reasoning)</p>
-                <div class="flex flex-col gap-3">
-        """, unsafe_allow_html=True)
         
+        # Build Sources HTML
+        sources_html = ""
         for i, doc in enumerate(res["context"][:2]):
-            st.markdown(f"""
-            <div class="flex gap-4 p-4 bg-[#0f1930] rounded-lg border border-white/5">
-                <span class="font-label text-[#ffa5d9] font-bold">[{i+1}]</span>
-                <p class="text-sm italic text-[#a3aac4]">"{doc.page_content[:250]}..."</p>
+            sources_html += f"""
+            <div class="flex gap-4 p-5 bg-[#192540]/40 rounded-xl border border-white/5 hover:border-[#9fa7ff]/30 transition-all">
+                <span class="font-label text-[#ffa5d9] font-bold text-sm">SOURCE [{i+1}]</span>
+                <p class="text-sm italic text-[#a3aac4] leading-relaxed">"{doc.page_content[:280]}..."</p>
             </div>
-            """, unsafe_allow_html=True)
-            
+            """
+
+        # Full Results Block
         st.markdown(f"""
+        <section class="bg-[#091328] rounded-2xl p-8 lg:p-12 space-y-12 border border-white/5 mt-12 shadow-2xl">
+            <div class="flex items-center gap-4 text-[#9fa7ff]">
+                <div class="w-12 h-12 bg-[#9fa7ff]/10 rounded-full flex items-center justify-center">
+                    <span class="material-symbols-outlined text-2xl">analytics</span>
+                </div>
+                <h3 class="font-headline text-3xl font-bold tracking-tight">Synthesis Report</h3>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="flex items-center gap-3">
+                    <div class="h-[1px] flex-grow bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                    <p class="font-label text-[10px] uppercase tracking-[0.3em] text-[#a3aac4] font-bold">Retrieved Reasoning Nodes</p>
+                    <div class="h-[1px] flex-grow bg-gradient-to-r from-transparent via-white/10 to-transparent"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {sources_html}
                 </div>
             </div>
 
-            <div class="pt-10 border-t border-white/5 relative">
-                <div class="absolute -top-4 left-0 bg-[#060e20] px-4 py-1 text-[10px] font-label font-bold text-[#9fa7ff] border border-[#9fa7ff]/20 rounded-full">FINAL ANALYSIS GENERATED</div>
-                <div class="prose prose-invert max-w-none text-xl leading-relaxed text-[#dee5ff]/90">
+            <div class="pt-12 border-t border-white/5 relative">
+                <div class="absolute -top-4 left-0 bg-[#060e20] px-5 py-1.5 text-[10px] font-label font-bold text-[#9fa7ff] border border-[#9fa7ff]/30 rounded-full flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9fa7ff] opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-[#9fa7ff]"></span>
+                    </span>
+                    FINAL ANALYSIS GENERATED
+                </div>
+                <div class="prose prose-invert max-w-none text-xl leading-relaxed text-[#dee5ff]/90 font-body">
                     {res["answer"]}
                 </div>
             </div>
             
-            <div class="mt-10 flex gap-4">
-                <button class="flex items-center gap-2 text-sm font-bold text-[#9fa7ff] px-4 py-2 rounded-lg bg-[#9fa7ff]/10 hover:bg-[#9fa7ff]/20">
-                    <span class="material-symbols-outlined text-sm">download</span> Export Analysis
+            <div class="mt-12 flex flex-wrap gap-4 pt-6">
+                <button class="flex items-center gap-3 text-sm font-bold text-[#101b8b] px-6 py-3 rounded-xl bg-[#9fa7ff] hover:bg-[#8d98ff] transition-all transform active:scale-95 shadow-lg shadow-[#9fa7ff]/10">
+                    <span class="material-symbols-outlined text-sm">file_download</span> Export Full Analysis
                 </button>
-                <button class="flex items-center gap-2 text-sm font-bold text-[#a3aac4] px-4 py-2 rounded-lg hover:bg-white/5">
-                    <span class="material-symbols-outlined text-sm">share</span> Share Reasoning
+                <button class="flex items-center gap-3 text-sm font-bold text-[#a3aac4] px-6 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 transition-all active:scale-95">
+                    <span class="material-symbols-outlined text-sm">share</span> Share Core Insights
                 </button>
             </div>
         </section>
         """, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True) # Closes space-y-8
 
 st.markdown('</div>', unsafe_allow_html=True)
 
