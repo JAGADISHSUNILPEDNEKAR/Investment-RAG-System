@@ -68,7 +68,7 @@ tailwind.config = {
         --glass-bg: rgba(15, 25, 48, 0.7);
         --glass-border: rgba(255, 255, 255, 0.08);
         --sidebar-width: 280px;
-        --content-gap: 100px;
+        --content-gap: 120px;
     }
 
     .stApp {
@@ -78,8 +78,9 @@ tailwind.config = {
     }
 
     .block-container {
-        padding: 0 !important;
-        max-width: 100% !important;
+        padding: 6rem var(--content-gap) 6rem calc(var(--content-gap) + 60px) !important;
+        max-width: 1600px !important;
+        margin: 0 auto;
     }
 
     #MainMenu { visibility: hidden; }
@@ -94,12 +95,9 @@ tailwind.config = {
     }
     [data-testid="stSidebarNav"] { display: none !important; }
 
-    /* Main Content Wrapper */
-    .main-content {
-        padding: 5rem var(--content-gap) 5rem calc(var(--content-gap) + 40px);
-        max-width: 1600px;
-        margin: 0 auto;
-        animation: fadeIn 0.8s ease-out;
+    /* Main Content Wrapper - using more intentional spacing */
+    .stMain {
+        background-color: #060e20;
     }
 
     @keyframes fadeIn {
@@ -307,7 +305,7 @@ with st.sidebar:
 # --- CUSTOM HEADER ---
 with st.container():
     st.markdown(f"""
-    <div class="flex items-center justify-between px-10 py-6 bg-slate-950/50 backdrop-blur-md border-b border-white/5 sticky top-0 z-50" style="height: 80px;">
+    <div class="flex items-center justify-between px-24 py-6 bg-slate-950/50 backdrop-blur-md border-b border-white/5 sticky top-0 z-50" style="height: 80px;">
         <div class="flex items-center gap-10">
             <span class="text-xl font-headline font-extrabold tracking-tighter bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">RAG ANALYZER</span>
             <div class="hidden md:flex gap-8">
@@ -332,7 +330,7 @@ with st.container():
     """, unsafe_allow_html=True)
 
 # --- MAIN CONTENT ---
-st.markdown('<div class="main-content">', unsafe_allow_html=True)
+# (Removed the broken main-content div wrapper)
 
 # ==============================================================================
 # TAB: KNOWLEDGE BASE (Retriever)
@@ -654,4 +652,3 @@ elif st.session_state.active_tab == "Dashboard":
 
     st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("</div>", unsafe_allow_html=True)
