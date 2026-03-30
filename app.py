@@ -314,7 +314,6 @@ if st.session_state.active_tab == "Retriever":
                         <p class="font-bold text-white text-lg truncate w-48 font-headline">{file_name}</p>
                     </div>
                 </div>
-                
                 <div class="space-y-4">
                     <div class="flex justify-between items-end">
                         <div class="space-y-1">
@@ -331,6 +330,11 @@ if st.session_state.active_tab == "Retriever":
                     </div>
                 </div>
             </div>
+            <div class="mt-8 pt-6 border-t border-white/5 flex items-center gap-3 opacity-60">
+                <span class="material-symbols-outlined text-sm text-slate-400">info</span>
+                <p class="text-[10px] text-slate-400 italic">Vectorization uses HuggingFace all-MiniLM-L6-v2</p>
+            </div>
+        </div>
         """, unsafe_allow_html=True)
 
         if uploaded_file:
