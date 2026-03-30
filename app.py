@@ -546,30 +546,55 @@ elif st.session_state.active_tab == "Dashboard":
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# --- GLOBAL BUTTON STYLES ---
+# --- GLOBAL BUTTON & INPUT STYLES ---
 st.markdown("""
 <style>
-    .stButton[key="btn_p"]>button, .stButton[key="btn_q"]>button {
-        background: linear-gradient(to right, #9fa7ff, #c180ff) !important;
-        color: #101b8b !important;
-        font-weight: 700 !important;
-        border-radius: 8px !important;
-        width: 100% !important;
-        padding: 1rem !important;
-        border: none !important;
+    .stButton>button {
+        border-radius: 16px !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-weight: 600 !important;
+        transition: all 0.3s !important;
     }
     
+    /* Primary Action Buttons */
+    .stButton[key="btn_p"]>button, .stButton[key="btn_q"]>button {
+        background: #5e66ff !important;
+        color: #060e20 !important;
+        padding: 1rem !important;
+        border: none !important;
+        box-shadow: 0 10px 20px rgba(94, 102, 255, 0.2) !important;
+    }
+    .stButton[key="btn_p"]>button:hover, .stButton[key="btn_q"]>button:hover {
+        background: #7d88ff !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 15px 30px rgba(94, 102, 255, 0.3) !important;
+    }
+    
+    /* Text Inputs */
     .stTextInput input {
-        background-color: #000000 !important;
-        border: 2px solid rgba(64, 72, 93, 0.2) !important;
-        border-radius: 12px !important;
-        padding: 1.5rem !important;
-        color: #dee5ff !important;
-        font-size: 1.25rem !important;
+        background-color: #091328 !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 20px !important;
+        padding: 1.5rem 2rem !important;
+        color: #fff !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 1.1rem !important;
+        transition: all 0.3s !important;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
     }
     .stTextInput input:focus {
-        border-color: #9fa7ff !important;
-        box-shadow: 0 0 0 4px rgba(159, 167, 255, 0.2) !important;
+        border-color: #5e66ff !important;
+        background-color: #0f1930 !important;
+        box-shadow: 0 0 0 4px rgba(94, 102, 255, 0.1) !important;
+    }
+    
+    /* Success/Error override */
+    .stSuccess, .stError, .stInfo {
+        background: rgba(15, 25, 48, 0.8) !important;
+        backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 16px !important;
+        color: #dee5ff !important;
     }
 </style>
 """, unsafe_allow_html=True)
