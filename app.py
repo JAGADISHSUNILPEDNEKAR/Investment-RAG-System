@@ -397,20 +397,21 @@ elif st.session_state.active_tab == "Verify DB":
                         </div>
                         """
                     
-                    st.markdown(f"""
-                    <div class="glass-card overflow-hidden">
-                        <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
-                            <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
-                                <span class="material-symbols-outlined text-primary">segment</span>
-                                Knowledge Segments
-                            </span>
-                            <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">{len(data['documents'])} Nodes</span>
+                    with st.expander("🔍 View Knowledge Segments", expanded=False):
+                        st.markdown(f"""
+                        <div class="glass-card overflow-hidden">
+                            <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
+                                <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-primary">segment</span>
+                                    Knowledge Segments
+                                </span>
+                                <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">{len(data['documents'])} Nodes</span>
+                            </div>
+                            <div class="p-8 space-y-6">
+                                {chunks_html}
+                            </div>
                         </div>
-                        <div class="p-8 space-y-6">
-                            {chunks_html}
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                        """, unsafe_allow_html=True)
                 
                 with v_cols[1]:
                     embeddings_html = ""
@@ -425,20 +426,21 @@ elif st.session_state.active_tab == "Verify DB":
                         </div>
                         """
                     
-                    st.markdown(f"""
-                    <div class="glass-card overflow-hidden">
-                        <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
-                            <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
-                                <span class="material-symbols-outlined text-primary">analytics</span>
-                                Vector Embeddings
-                            </span>
-                            <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">d=384</span>
+                    with st.expander("📊 View Latent Embeddings", expanded=False):
+                        st.markdown(f"""
+                        <div class="glass-card overflow-hidden">
+                            <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
+                                <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
+                                    <span class="material-symbols-outlined text-primary">analytics</span>
+                                    Vector Embeddings
+                                </span>
+                                <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">d=384</span>
+                            </div>
+                            <div class="p-8 space-y-6">
+                                {embeddings_html}
+                            </div>
                         </div>
-                        <div class="p-8 space-y-6">
-                            {embeddings_html}
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
+                        """, unsafe_allow_html=True)
         except Exception as e: st.error(f"Integrity check failed: {e}")
     else: st.info("Intelligence core is offline. Please ingest documents to initialize the vector database.")
     st.markdown("</div>", unsafe_allow_html=True)
