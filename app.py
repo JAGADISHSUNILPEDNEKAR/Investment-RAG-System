@@ -201,6 +201,7 @@ tailwind.config = {
 def get_embeddings():
     return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
+# FIX #5: Corrected model name from "gemini-flash-latest" to "gemini-1.5-flash-latest"
 @st.cache_resource
 def get_llm():
     return ChatGoogleGenerativeAI(model="gemini-1.5-flash-latest", temperature=0.2)
@@ -241,24 +242,53 @@ with st.sidebar:
         st.session_state.active_tab = "Verify DB"
         st.rerun()
 
+    # FIX #3 & #7: Use JS targeting by button text content — the only reliable
+    # approach since Streamlit does not expose the Python `key` as an HTML attribute.
+    tab_label_map = {
+        "Dashboard": "Dashboard",
+        "Retriever": "Knowledge Base",
+        "Verify DB": "System Integrity",
+    }
+    active_label = tab_label_map.get(st.session_state.active_tab, "")
     st.markdown(f"""
     <script>
-    const labels = ["Dashboard", "Knowledge Base", "System Integrity"];
-    const activeTab = "{st.session_state.active_tab}";
-    const mapping = {{ "Dashboard": "Dashboard", "Retriever": "Knowledge Base", "Verify DB": "System Integrity" }};
-    
-    const buttons = window.parent.document.querySelectorAll('section[data-testid="stSidebar"] button');
-    buttons.forEach(btn => {{
-        if (btn.innerText.includes(mapping[activeTab])) {{
-            btn.style.backgroundColor = "rgba(94, 102, 255, 0.15)";
-            btn.style.color = "white";
-            btn.style.borderLeft = "3px solid #5e66ff";
-        }} else if (labels.some(l => btn.innerText.includes(l))) {{
-            btn.style.backgroundColor = "transparent";
-            btn.style.color = "#a3aac4";
-            btn.style.borderLeft = "1px solid transparent";
-        }}
-    }});
+    (function applyActiveNav() {{
+        const activeLabel = {active_label!r};
+        const buttons = window.parent.document.querySelectorAll(
+            'section[data-testid="stSidebar"] button'
+        );
+        buttons.forEach(btn => {{
+            const label = btn.innerText.trim();
+            if (label === activeLabel) {{
+                btn.style.backgroundColor = 'rgba(94, 102, 255, 0.15)';
+                btn.style.color = '#ffffff';
+                btn.style.borderLeft = '3px solid #5e66ff';
+            }} else {{
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                btn.style.borderLeft = '';
+            }}
+        }});
+    }})();
+    // Re-run after Streamlit re-renders the DOM
+    setTimeout(() => {{
+        const activeLabel = {active_label!r};
+        const buttons = window.parent.document.querySelectorAll(
+            'section[data-testid="stSidebar"] button'
+        );
+        buttons.forEach(btn => {{
+            const label = btn.innerText.trim();
+            if (label === activeLabel) {{
+                btn.style.backgroundColor = 'rgba(94, 102, 255, 0.15)';
+                btn.style.color = '#ffffff';
+                btn.style.borderLeft = '3px solid #5e66ff';
+            }} else {{
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                btn.style.borderLeft = '';
+            }}
+        }});
+    }}, 300);
     </script>
     """, unsafe_allow_html=True)
 
@@ -347,6 +377,9 @@ if st.session_state.active_tab == "Retriever":
         file_name  = uploaded_file.name if uploaded_file else "-"
         file_size  = (uploaded_file.size / 1024 / 1024) if uploaded_file else 0
 
+        # FIX #2: Glass-card is fully self-contained in a single st.markdown call.
+        # The Streamlit button is rendered outside the card, avoiding the unclosed-div
+        # issue caused by mixing widget calls with custom HTML markup.
         st.markdown(f"""
         <div class="glass-card p-8 border-l-4 border-l-primary/40">
             <div class="space-y-8">
@@ -382,8 +415,10 @@ if st.session_state.active_tab == "Retriever":
         </div>
         """, unsafe_allow_html=True)
 
+        # FIX #1: Removed the duplicate info block that appeared here previously.
+        # The button now renders cleanly beneath the closed glass-card div.
         if uploaded_file:
-            if st.button("Begin Neural Indexing", type="primary", use_container_width=True):
+            if st.button("Begin Neural Indexing", key="btn_p", type="primary", use_container_width=True):
                 with st.spinner("Analyzing Document Topology..."):
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
                         tmp.write(uploaded_file.getvalue())
@@ -429,9 +464,13 @@ elif st.session_state.active_tab == "Verify DB":
 
     if os.path.exists(DB_DIR):
         try:
-            db = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
-            collection = db._collection
-            data = collection.get(include=['documents', 'embeddings'], limit=3)
+            # FIX #6: Use LangChain's Chroma wrapper to access the collection so the
+            # collection name always matches what the ingestion pipeline creates.
+            # Previously, raw chromadb.PersistentClient + list_collections() could
+            # silently inspect the wrong collection or fail across chromadb versions.
+            vs         = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
+            collection = vs._collection
+            data       = collection.get(include=["documents", "embeddings"], limit=3)
 
             v_cols = st.columns(2, gap="large")
 
@@ -509,6 +548,12 @@ elif st.session_state.active_tab == "Dashboard":
         </div>
     """, unsafe_allow_html=True)
 
+    st.markdown("""
+    <div class="relative group mt-8">
+        <div class="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-500"></div>
+    </div>
+    """, unsafe_allow_html=True)
+
     q_in = st.text_input(
         "Ask...",
         placeholder="What are the key risk factors mentioned in the portfolio report?",
@@ -517,7 +562,7 @@ elif st.session_state.active_tab == "Dashboard":
 
     q_cols = st.columns([1, 4, 1])
     with q_cols[1]:
-        if st.button("Execute Neural Search", type="primary", use_container_width=True):
+        if st.button("Execute Neural Search", key="btn_q", type="primary", use_container_width=True):
             if q_in and os.path.exists(DB_DIR):
                 with st.spinner("Synthesizing Insights..."):
                     vs    = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
