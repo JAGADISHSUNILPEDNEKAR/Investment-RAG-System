@@ -603,8 +603,20 @@ elif st.session_state.active_tab == "Dashboard":
                         create_stuff_documents_chain(
                             get_llm(),
                             ChatPromptTemplate.from_messages([
-                                ("system", "Answer with context:\n\n{context}"),
-                                ("human",  "{input}"),
+                                ("system", """You are a precision financial analyst. Using the provided context, generate a structured Synthesis Report.
+
+Format your response exactly as follows:
+### Summary of the Provided Context
+[Summarize the specific text provided in the context nodes]
+
+### Summary of the Source Material
+[If you can identify the book or source, e.g., Benjamin Graham's 'The Intelligent Investor', provide a high-level summary of its core philosophy. If unknown, skip this section.]
+
+Use bold text for key terms and maintain a professional, insightful tone.
+
+Context:
+{context}"""),
+                                ("human", "{input}"),
                             ])
                         )
                     )
