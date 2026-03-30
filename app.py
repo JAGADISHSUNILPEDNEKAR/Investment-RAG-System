@@ -235,7 +235,7 @@ def get_google_api_key():
 def get_llm():
     api_key = get_google_api_key()
     return ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash", 
+        model="gemini-2.5-flash", 
         temperature=0.2,
         google_api_key=api_key
     )
@@ -630,7 +630,11 @@ Context:
                             ])
                         )
                     )
-                    st.session_state.ans = chain.invoke({"input": q_in})
+                    try:
+                        st.session_state.ans = chain.invoke({"input": q_in})
+                    except Exception as e:
+                        st.error(f"⚠️ Model invocation failed: {e}")
+                        st.info("💡 This usually means the API key is invalid or the model is unavailable. Check your GOOGLE_API_KEY in Streamlit Cloud Secrets.")
             elif not os.path.exists(DB_DIR):
                 st.error("No knowledge base found. Please ingest documents first.")
 
