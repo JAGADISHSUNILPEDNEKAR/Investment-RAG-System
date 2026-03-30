@@ -225,10 +225,10 @@ tailwind.config = {
 def get_embeddings():
     return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-# FIX #5: Corrected model name from "gemini-flash-latest" to "gemini-1.5-flash-latest"
+# FIX #5: Corrected model name to "gemini-flash-latest" as per API availability
 @st.cache_resource
 def get_llm():
-    return ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.2)
+    return ChatGoogleGenerativeAI(model="gemini-flash-latest", temperature=0.2)
 
 embeddings = get_embeddings()
 DB_DIR = "./chroma_db"
