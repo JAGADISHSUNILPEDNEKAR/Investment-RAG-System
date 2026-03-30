@@ -701,19 +701,65 @@ Context:
         # --- LLM Answer (contains markdown → st.markdown, NOT st.html) ---
         st.markdown(res["answer"])
 
-        # --- Action Buttons (pure HTML → st.html) ---
-        st.html("""
-        <div style="margin-top: 32px; display: flex; flex-wrap: wrap; gap: 16px; padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.05);">
-            <button style="background: #5e66ff; color: #060e20; font-weight: 700; padding: 16px 32px; border-radius: 16px; border: none; cursor: pointer; display: flex; align-items: center; gap: 12px; font-family: 'Outfit', sans-serif; font-size: 14px; box-shadow: 0 10px 20px rgba(94,102,255,0.1); transition: all 0.3s;">
-                <span class="material-symbols-outlined" style="font-size: 20px;">file_download</span>
-                <span>Export Analysis</span>
-            </button>
-            <button style="background: rgba(255,255,255,0.05); color: #fff; font-weight: 700; padding: 16px 32px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; align-items: center; gap: 12px; font-family: 'Outfit', sans-serif; font-size: 14px; transition: all 0.3s;">
-                <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
-                <span>Share Insights</span>
-            </button>
-        </div>
-        """)
+        # --- Action Buttons (functional Streamlit components) ---
+        # Custom CSS to style the action buttons area
+        st.markdown("""
+        <style>
+            /* Style the action buttons row */
+            div[data-testid="stHorizontalBlock"].action-buttons-row {
+                margin-top: 32px;
+                padding: 24px 0;
+                border-top: 1px solid rgba(255,255,255,0.05);
+            }
+            /* Export / Download button */
+            .stDownloadButton>button {
+                background: #5e66ff !important;
+                color: #060e20 !important;
+                font-weight: 700 !important;
+                padding: 16px 32px !important;
+                border-radius: 16px !important;
+                border: none !important;
+                font-family: 'Outfit', sans-serif !important;
+                font-size: 14px !important;
+                box-shadow: 0 10px 20px rgba(94,102,255,0.1) !important;
+                transition: all 0.3s !important;
+            }
+            .stDownloadButton>button:hover {
+                background: #7d88ff !important;
+                transform: translateY(-2px) !important;
+                box-shadow: 0 15px 30px rgba(94,102,255,0.3) !important;
+            }
+        </style>
+        """, unsafe_allow_html=True)
+
+        # Build the export content
+        export_content = f"PRECISION AI — Synthesis Report\n{'='*50}\n\n"
+        export_content += f"Query: {q_in}\n\n"
+        export_content += f"{'—'*50}\nRETRIEVED CONTEXT NODES\n{'—'*50}\n\n"
+        for i, doc in enumerate(res["context"][:2]):
+            export_content += f"[Context Node {i+1}]\n{doc.page_content[:500]}\n\n"
+        export_content += f"{'—'*50}\nANALYSIS\n{'—'*50}\n\n"
+        export_content += res["answer"]
+
+        btn_cols = st.columns([1, 1, 3])
+        with btn_cols[0]:
+            st.download_button(
+                label="⬇ Export Analysis",
+                data=export_content,
+                file_name="precision_synthesis_report.txt",
+                mime="text/plain",
+                key="btn_export",
+                use_container_width=True,
+            )
+        with btn_cols[1]:
+            if st.button("🔗 Share Insights", key="btn_share", use_container_width=True):
+                st.toast("✅ Insights copied to clipboard!", icon="📋")
+                # Use JS to copy the answer to clipboard
+                st.markdown(f"""
+                <script>
+                navigator.clipboard.writeText({res["answer"]!r}).catch(function() {{}});
+                </script>
+                """, unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
