@@ -179,52 +179,80 @@ if "process_status" not in st.session_state:
 # --- SIDEBAR ---
 with st.sidebar:
     st.markdown("""
-    <div class="mb-10 pt-4">
-        <div class="flex items-center gap-3 mb-10">
-            <div class="w-10 h-10 bg-gradient-to-br from-[#9fa7ff] to-[#c180ff] rounded-lg flex items-center justify-center text-[#101b8b]">
-                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">psychology</span>
+    <div class="mb-12 pt-6 px-2">
+        <div class="flex items-center gap-4 mb-12">
+            <div class="w-11 h-11 bg-primary rounded-2xl flex items-center justify-center text-slate-950 shadow-lg shadow-primary/20 rotate-3">
+                <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">deployed_code</span>
             </div>
             <div>
-                <h2 class="text-indigo-400 font-bold text-sm">Precision Architect</h2>
-                <p class="text-[9px] text-[#a3aac4] uppercase tracking-tighter">RAG Engine v2.4</p>
+                <h2 class="text-white font-headline font-bold text-lg tracking-tight">Precision</h2>
+                <p class="text-[10px] text-slate-400 font-label uppercase tracking-widest leading-none">Architect v2.4</p>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    if st.button("Dashboard", key="nav_dash"): st.session_state.active_tab = "Dashboard"
-    if st.button("Retriever", key="nav_retr"): st.session_state.active_tab = "Retriever"
-    if st.button("Verify DB", key="nav_verify"): st.session_state.active_tab = "Verify DB"
+    # Navigation logic with active state styling
+    cols = st.columns([1])
+    with cols[0]:
+        dash_active = "nav-active" if st.session_state.active_tab == "Dashboard" else ""
+        if st.button("Dashboard", key="nav_dash", help="View analytics and queries", use_container_width=True): 
+            st.session_state.active_tab = "Dashboard"
+            st.rerun()
+            
+        retr_active = "nav-active" if st.session_state.active_tab == "Retriever" else ""
+        if st.button("Knowledge Base", key="nav_retr", help="Upload and index documents", use_container_width=True): 
+            st.session_state.active_tab = "Retriever"
+            st.rerun()
+            
+        verify_active = "nav-active" if st.session_state.active_tab == "Verify DB" else ""
+        if st.button("System Integrity", key="nav_verify", help="Check vector database health", use_container_width=True): 
+            st.session_state.active_tab = "Verify DB"
+            st.rerun()
+
+    # Injecting active state CSS for specific buttons
+    st.markdown(f"""
+    <style>
+        div[data-testid="stButton"] button[key="nav_dash"] {{ {f'background-color: rgba(94, 102, 255, 0.15) !important; color: white !important; border-left: 3px solid #5e66ff !important;' if st.session_state.active_tab == "Dashboard" else ''} }}
+        div[data-testid="stButton"] button[key="nav_retr"] {{ {f'background-color: rgba(94, 102, 255, 0.15) !important; color: white !important; border-left: 3px solid #5e66ff !important;' if st.session_state.active_tab == "Retriever" else ''} }}
+        div[data-testid="stButton"] button[key="nav_verify"] {{ {f'background-color: rgba(94, 102, 255, 0.15) !important; color: white !important; border-left: 3px solid #5e66ff !important;' if st.session_state.active_tab == "Verify DB" else ''} }}
+    </style>
+    """, unsafe_allow_html=True)
     
     st.markdown("""
-    <div class="mt-80 pt-6 border-t border-white/5">
-        <div class="flex items-center gap-3 text-[#a3aac4] text-xs">
-            <span class="material-symbols-outlined text-sm">bolt</span>
-            <span>System Health: Optimal</span>
+    <div class="mt-auto mb-8 pt-6 px-2 border-t border-white/5">
+        <div class="flex items-center gap-3 text-slate-400 text-xs px-2 py-3 bg-slate-800/40 rounded-xl">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span class="font-medium">System Engine: Optimal</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 # --- CUSTOM HEADER ---
 st.markdown(f"""
-<div class="custom-header font-manrope">
-    <div class="flex items-center gap-8">
-        <span class="text-2xl font-bold tracking-tighter text-indigo-400">RAG Analyzer</span>
-        <div class="hidden md:flex gap-6">
-            <span class="text-[#a3aac4] text-sm">Portfolio</span>
-            <span class="text-indigo-400 text-sm border-b-2 border-indigo-400 pb-1">Analyses</span>
-            <span class="text-[#a3aac4] text-sm">Sources</span>
+<div class="flex items-center justify-between px-10 py-6 bg-slate-950/50 backdrop-blur-md border-b border-white/5 sticky top-0 z-50">
+    <div class="flex items-center gap-10">
+        <span class="text-xl font-headline font-extrabold tracking-tighter bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">RAG ANALYZER</span>
+        <div class="hidden md:flex gap-8">
+            <span class="text-sm font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">Portfolio</span>
+            <span class="text-sm font-medium text-primary border-b-2 border-primary pb-1">Intelligence</span>
+            <span class="text-sm font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">Resources</span>
         </div>
     </div>
-    <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 bg-[#0f1930] px-3 py-1.5 rounded-full border border-[#40485d]/20">
+    <div class="flex items-center gap-6">
+        <div class="flex items-center gap-3 bg-slate-900 px-4 py-2 rounded-2xl border border-white/5">
             <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#9fa7ff] opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-[#9fa7ff]"></span>
+                <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
             </span>
-            <span class="text-[10px] uppercase tracking-widest text-[#9fa7ff] font-bold font-label">Status: {st.session_state.process_status}</span>
+            <span class="text-[10px] uppercase tracking-widest text-primary-300 font-bold font-label">{st.session_state.process_status}</span>
         </div>
-        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHg42IWLey4S15SqkykRxyXZ74kddwgq21vEX9uiG7QWnY_jlHlpQHBelnSrAMrvANaeXGQBJZ2qZn0f6kOOvLsoq7Q-cq379cmg6TdqL4rT_0XzNRWi4dIwrFilyDGKhr5yCyohoXL1xviVF5bUuRt8Yifxe-VxcnY4D8YLCtxxYVNw8POr7pS-0JH8PXge7dq7HkrecSoLkD56oNshJ_iv4w7kMyv3riQuGn5LZXVdB1-NXyu6BOa6vvncteixXZfnbw3ewfQKE" class="profile-img">
+        <div class="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHg42IWLey4S15SqkykRxyXZ74kddwgq21vEX9uiG7QWnY_jlHlpQHBelnSrAMrvANaeXGQBJZ2qZn0f6kOOvLsoq7Q-cq379cmg6TdqL4rT_0XzNRWi4dIwrFilyDGKhr5yCyohoXL1xviVF5bUuRt8Yifxe-VxcnY4D8YLCtxxYVNw8POr7pS-0JH8PXge7dq7HkrecSoLkD56oNshJ_iv4w7kMyv3riQuGn5LZXVdB1-NXyu6BOa6vvncteixXZfnbw3ewfQKE" class="w-full h-full rounded-full object-cover shadow-lg">
+        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
