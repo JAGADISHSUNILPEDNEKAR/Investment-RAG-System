@@ -505,53 +505,53 @@ elif st.session_state.active_tab == "Verify DB":
                 chunks_html = ""
                 for i, doc in enumerate(data["documents"]):
                     chunks_html += f"""
-                    <div class="p-5 bg-slate-900/50 rounded-2xl border border-white/5 space-y-3 group hover:border-primary/30 transition-all">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-primary opacity-40 group-hover:opacity-100 transition-opacity"></span>
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Chunk {i + 1}</span>
-                        </div>
-                        <p class="text-sm text-slate-400 italic leading-relaxed">"{doc[:240]}..."</p>
-                    </div>
-                    """
+<div class="p-5 bg-slate-900/50 rounded-2xl border border-white/5 space-y-3 group hover:border-primary/30 transition-all">
+    <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-primary opacity-40 group-hover:opacity-100 transition-opacity"></span>
+        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Chunk {i + 1}</span>
+    </div>
+    <p class="text-sm text-slate-400 italic leading-relaxed">"{doc[:240]}..."</p>
+</div>
+"""
                 with st.expander("🔍 View Knowledge Segments", expanded=False):
-                    st.markdown(textwrap.dedent(f"""
-                    <div class="glass-card overflow-hidden">
-                        <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
-                            <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
-                                <span class="material-symbols-outlined text-primary">segment</span>
-                                Knowledge Segments
-                            </span>
-                            <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">{len(data["documents"])} Nodes</span>
-                        </div>
-                        <div class="p-8 space-y-6">{textwrap.dedent(chunks_html)}</div>
-                    </div>
-                    """), unsafe_allow_html=True)
+                    st.markdown(f"""
+<div class="glass-card overflow-hidden">
+    <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
+        <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary">segment</span>
+            Knowledge Segments
+        </span>
+        <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">{len(data['documents'])} Nodes</span>
+    </div>
+    <div class="p-8 space-y-6">{chunks_html}</div>
+</div>
+""", unsafe_allow_html=True)
 
             with v_cols[1]:
                 embeddings_html = ""
                 for i, emb in enumerate(data["embeddings"]):
                     embeddings_html += f"""
-                    <div class="p-5 bg-slate-950 rounded-2xl border border-white/5 space-y-3 group hover:border-primary/30 transition-all">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-primary-400 opacity-40 group-hover:opacity-100 transition-opacity"></span>
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Embedding {i + 1}</span>
-                        </div>
-                        <p class="text-[9px] font-mono text-primary/60 break-all leading-tight">[{", ".join([f"{x:.3f}" for x in emb[:15]])}...]</p>
-                    </div>
-                    """
+<div class="p-5 bg-slate-950 rounded-2xl border border-white/5 space-y-3 group hover:border-primary/30 transition-all">
+    <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-primary-400 opacity-40 group-hover:opacity-100 transition-opacity"></span>
+        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Embedding {i + 1}</span>
+    </div>
+    <p class="text-[9px] font-mono text-primary/60 break-all leading-tight">[{", ".join([f"{x:.3f}" for x in emb[:15]])}...]</p>
+</div>
+"""
                 with st.expander("📊 View Latent Embeddings", expanded=False):
-                    st.markdown(textwrap.dedent(f"""
-                    <div class="glass-card overflow-hidden">
-                        <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
-                            <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
-                                <span class="material-symbols-outlined text-primary">analytics</span>
-                                Vector Embeddings
-                            </span>
-                            <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">d=384</span>
-                        </div>
-                        <div class="p-8 space-y-6">{textwrap.dedent(embeddings_html)}</div>
-                    </div>
-                    """), unsafe_allow_html=True)
+                    st.markdown(f"""
+<div class="glass-card overflow-hidden">
+    <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
+        <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary">analytics</span>
+            Vector Embeddings
+        </span>
+        <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">d=384</span>
+    </div>
+    <div class="p-8 space-y-6">{embeddings_html}</div>
+</div>
+""", unsafe_allow_html=True)
 
         except Exception as e:
             st.error(f"Integrity check failed: {e}")
@@ -618,14 +618,14 @@ elif st.session_state.active_tab == "Dashboard":
         sources_html = ""
         for i, doc in enumerate(res["context"][:2]):
             sources_html += f"""
-            <div class="glass-card p-6 border-l-2 border-l-primary/30 hover:border-l-primary transition-all">
-                <div class="flex items-center gap-3 mb-3">
-                    <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Context node {i + 1}</span>
-                    <div class="h-px flex-grow bg-white/5"></div>
-                </div>
-                <p class="text-sm italic text-slate-400 leading-relaxed font-medium">"{doc.page_content[:320]}..."</p>
-            </div>
-            """
+<div class="glass-card p-6 border-l-2 border-l-primary/30 hover:border-l-primary transition-all">
+    <div class="flex items-center gap-3 mb-3">
+        <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Context node {i + 1}</span>
+        <div class="h-px flex-grow bg-white/5"></div>
+    </div>
+    <p class="text-sm italic text-slate-400 leading-relaxed font-medium">"{doc.page_content[:320]}..."</p>
+</div>
+"""
 
         st.markdown(textwrap.dedent(f"""
         <div class="glass-card p-8 lg:p-12 space-y-12 mt-8 relative overflow-hidden">
@@ -652,7 +652,7 @@ elif st.session_state.active_tab == "Dashboard":
                     <div class="h-px w-full bg-gradient-to-r from-primary/20 to-transparent"></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {textwrap.dedent(sources_html)}
+{sources_html}
                 </div>
             </div>
 
