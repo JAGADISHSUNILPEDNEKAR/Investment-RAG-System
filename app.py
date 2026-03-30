@@ -225,10 +225,20 @@ tailwind.config = {
 def get_embeddings():
     return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
-# FIX #5: Corrected model name to "gemini-flash-latest" as per API availability
+# FIX #5: Native Streamlit Secrets Handling with fallback to .env for local dev
+def get_google_api_key():
+    if "GOOGLE_API_KEY" in st.secrets:
+        return st.secrets["GOOGLE_API_KEY"]
+    return os.getenv("GOOGLE_API_KEY")
+
 @st.cache_resource
 def get_llm():
-    return ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.2)
+    api_key = get_google_api_key()
+    return ChatGoogleGenerativeAI(
+        model="gemini-1.5-flash-latest", 
+        temperature=0.2,
+        google_api_key=api_key
+    )
 
 embeddings = get_embeddings()
 DB_DIR = "./chroma_db"
@@ -323,7 +333,7 @@ with st.sidebar:
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
-            <span class="font-medium">System Engine: Optimal</span>
+            <span class="font-medium">System Engine: {"Optimal" if get_google_api_key() else "Offline"}</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
