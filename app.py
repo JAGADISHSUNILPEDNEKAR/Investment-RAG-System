@@ -1,7 +1,6 @@
 import streamlit as st
 import os
 import tempfile
-import time
 from dotenv import load_dotenv
 
 import chromadb
@@ -19,13 +18,13 @@ load_dotenv()
 
 # Streamlit Page Config
 st.set_page_config(
-    page_title="RAG Analyzer - Precision Architect", 
-    page_icon="https://cdn-icons-png.flaticon.com/512/2632/2632280.png", 
+    page_title="RAG Analyzer - Precision Architect",
+    page_icon="https://cdn-icons-png.flaticon.com/512/2632/2632280.png",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- NEW DARK THEME TAILWIND & CSS ---
+# --- DARK THEME TAILWIND & CSS ---
 st.markdown("""
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -36,13 +35,13 @@ tailwind.config = {
   theme: {
     extend: {
       colors: {
-        primary: { 
-          50: '#f0f2ff', 100: '#e0e5ff', 200: '#c1ccff', 300: '#9faaff', 400: '#7d88ff', 
+        primary: {
+          50: '#f0f2ff', 100: '#e0e5ff', 200: '#c1ccff', 300: '#9faaff', 400: '#7d88ff',
           500: '#5e66ff', 600: '#4b52cc', 700: '#383d99', 800: '#262966', 900: '#131533',
           DEFAULT: '#5e66ff'
         },
-        slate: { 
-          950: '#060e20', 900: '#091328', 800: '#0f1930', 700: '#192540', 600: '#1f2b49' 
+        slate: {
+          950: '#060e20', 900: '#091328', 800: '#0f1930', 700: '#192540', 600: '#1f2b49'
         }
       },
       fontFamily: {
@@ -77,12 +76,12 @@ tailwind.config = {
         color: #dee5ff;
         font-family: 'Inter', sans-serif;
     }
-    
+
     .block-container {
         padding: 0 !important;
         max-width: 100% !important;
     }
-    
+
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
 
@@ -95,7 +94,7 @@ tailwind.config = {
     }
     [data-testid="stSidebarNav"] { display: none !important; }
 
-    /* Main Content Wrapper - Fixing Spacing */
+    /* Main Content Wrapper */
     .main-content {
         padding: 4rem var(--content-gap) 4rem calc(var(--content-gap) + 20px);
         max-width: 1600px;
@@ -122,7 +121,7 @@ tailwind.config = {
         transform: translateY(-2px);
     }
 
-    /* Sidebar Buttons */
+    /* Sidebar Buttons - base style */
     section[data-testid="stSidebar"] .stButton>button {
         background-color: transparent !important;
         color: #a3aac4 !important;
@@ -143,19 +142,57 @@ tailwind.config = {
         color: #fff !important;
         border-color: rgba(94, 102, 255, 0.2) !important;
     }
-    
-    /* Active Nav Styling */
-    .nav-active {
-        background-color: rgba(94, 102, 255, 0.15) !important;
-        color: #fff !important;
-        border-left: 3px solid #5e66ff !important;
-    }
 
     /* Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #060e20; }
     ::-webkit-scrollbar-thumb { background: #1f2b49; border-radius: 10px; border: 2px solid #060e20; }
     ::-webkit-scrollbar-thumb:hover { background: #5e66ff; }
+
+    /* Primary Action Buttons */
+    .stButton>button[kind="primary"] {
+        background: #5e66ff !important;
+        color: #060e20 !important;
+        padding: 1rem !important;
+        border: none !important;
+        border-radius: 16px !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-weight: 600 !important;
+        box-shadow: 0 10px 20px rgba(94, 102, 255, 0.2) !important;
+        transition: all 0.3s !important;
+    }
+    .stButton>button[kind="primary"]:hover {
+        background: #7d88ff !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 15px 30px rgba(94, 102, 255, 0.3) !important;
+    }
+
+    /* Text Inputs */
+    .stTextInput input {
+        background-color: #091328 !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 20px !important;
+        padding: 1.5rem 2rem !important;
+        color: #fff !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 1.1rem !important;
+        transition: all 0.3s !important;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
+    }
+    .stTextInput input:focus {
+        border-color: #5e66ff !important;
+        background-color: #0f1930 !important;
+        box-shadow: 0 0 0 4px rgba(94, 102, 255, 0.1) !important;
+    }
+
+    /* Success/Error override */
+    .stSuccess, .stError, .stInfo {
+        background: rgba(15, 25, 48, 0.8) !important;
+        backdrop-filter: blur(10px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+        border-radius: 16px !important;
+        color: #dee5ff !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -166,7 +203,7 @@ def get_embeddings():
 
 @st.cache_resource
 def get_llm():
-    return ChatGoogleGenerativeAI(model="gemini-flash-latest", temperature=0.2)
+    return ChatGoogleGenerativeAI(model="gemini-1.5-flash-latest", temperature=0.2)
 
 embeddings = get_embeddings()
 DB_DIR = "./chroma_db"
@@ -191,34 +228,40 @@ with st.sidebar:
         </div>
     </div>
     """, unsafe_allow_html=True)
-    
-    # Navigation logic with active state styling
-    cols = st.columns([1])
-    with cols[0]:
-        dash_active = "nav-active" if st.session_state.active_tab == "Dashboard" else ""
-        if st.button("Dashboard", key="nav_dash", help="View analytics and queries", use_container_width=True): 
-            st.session_state.active_tab = "Dashboard"
-            st.rerun()
-            
-        retr_active = "nav-active" if st.session_state.active_tab == "Retriever" else ""
-        if st.button("Knowledge Base", key="nav_retr", help="Upload and index documents", use_container_width=True): 
-            st.session_state.active_tab = "Retriever"
-            st.rerun()
-            
-        verify_active = "nav-active" if st.session_state.active_tab == "Verify DB" else ""
-        if st.button("System Integrity", key="nav_verify", help="Check vector database health", use_container_width=True): 
-            st.session_state.active_tab = "Verify DB"
-            st.rerun()
 
-    # Injecting active state CSS for specific buttons
+    if st.button("Dashboard", key="nav_dash", use_container_width=True):
+        st.session_state.active_tab = "Dashboard"
+        st.rerun()
+
+    if st.button("Knowledge Base", key="nav_retr", use_container_width=True):
+        st.session_state.active_tab = "Retriever"
+        st.rerun()
+
+    if st.button("System Integrity", key="nav_verify", use_container_width=True):
+        st.session_state.active_tab = "Verify DB"
+        st.rerun()
+
     st.markdown(f"""
-    <style>
-        div[data-testid="stButton"] button[key="nav_dash"] {{ {f'background-color: rgba(94, 102, 255, 0.15) !important; color: white !important; border-left: 3px solid #5e66ff !important;' if st.session_state.active_tab == "Dashboard" else ''} }}
-        div[data-testid="stButton"] button[key="nav_retr"] {{ {f'background-color: rgba(94, 102, 255, 0.15) !important; color: white !important; border-left: 3px solid #5e66ff !important;' if st.session_state.active_tab == "Retriever" else ''} }}
-        div[data-testid="stButton"] button[key="nav_verify"] {{ {f'background-color: rgba(94, 102, 255, 0.15) !important; color: white !important; border-left: 3px solid #5e66ff !important;' if st.session_state.active_tab == "Verify DB" else ''} }}
-    </style>
-    """, unsafe_allow_html=True)
+    <script>
+    const labels = ["Dashboard", "Knowledge Base", "System Integrity"];
+    const activeTab = "{st.session_state.active_tab}";
+    const mapping = {{ "Dashboard": "Dashboard", "Retriever": "Knowledge Base", "Verify DB": "System Integrity" }};
     
+    const buttons = window.parent.document.querySelectorAll('section[data-testid="stSidebar"] button');
+    buttons.forEach(btn => {{
+        if (btn.innerText.includes(mapping[activeTab])) {{
+            btn.style.backgroundColor = "rgba(94, 102, 255, 0.15)";
+            btn.style.color = "white";
+            btn.style.borderLeft = "3px solid #5e66ff";
+        }} else if (labels.some(l => btn.innerText.includes(l))) {{
+            btn.style.backgroundColor = "transparent";
+            btn.style.color = "#a3aac4";
+            btn.style.borderLeft = "1px solid transparent";
+        }}
+    }});
+    </script>
+    """, unsafe_allow_html=True)
+
     st.markdown("""
     <div class="mt-auto mb-8 pt-6 px-2 border-t border-white/5">
         <div class="flex items-center gap-3 text-slate-400 text-xs px-2 py-3 bg-slate-800/40 rounded-xl">
@@ -261,6 +304,9 @@ with st.container():
 # --- MAIN CONTENT ---
 st.markdown('<div class="main-content">', unsafe_allow_html=True)
 
+# ==============================================================================
+# TAB: KNOWLEDGE BASE (Retriever)
+# ==============================================================================
 if st.session_state.active_tab == "Retriever":
     st.markdown("""
     <div class="space-y-12">
@@ -274,8 +320,9 @@ if st.session_state.active_tab == "Retriever":
             </div>
         </div>
     """, unsafe_allow_html=True)
-    
+
     r_cols = st.columns([1.8, 1], gap="large")
+
     with r_cols[0]:
         st.markdown("""
         <div class="glass-card p-12 flex flex-col items-center justify-center text-center space-y-8 relative overflow-hidden group">
@@ -285,26 +332,24 @@ if st.session_state.active_tab == "Retriever":
             </div>
             <div class="space-y-3">
                 <h3 class="text-2xl font-bold font-headline text-white tracking-tight">Drop investment documents here</h3>
-                <p class="text-slate-400 font-medium">Maximum file size: <span class="text-white">50MB</span> • Supports <span class="text-white">PDF, DOCX</span></p>
+                <p class="text-slate-400 font-medium">Maximum file size: <span class="text-white">50MB</span> &bull; Supports <span class="text-white">PDF</span></p>
             </div>
             <div class="px-8 py-3 bg-white/5 rounded-2xl border border-white/10 group-hover:border-primary/30 transition-all font-semibold text-slate-300">
                 Browse Files
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
-        # Hidden file uploader layered on top or styled
+
         uploaded_file = st.file_uploader("Upload", type="pdf", label_visibility="collapsed")
 
     with r_cols[1]:
-        # Build Document Status HTML
         status_text = "Ready for Ingestion" if uploaded_file else "Awaiting Selection"
-        file_name = uploaded_file.name if uploaded_file else "-"
-        file_size = (uploaded_file.size/1024/1024) if uploaded_file else 0
-        
+        file_name  = uploaded_file.name if uploaded_file else "-"
+        file_size  = (uploaded_file.size / 1024 / 1024) if uploaded_file else 0
+
         st.markdown(f"""
-        <div class="glass-card p-8 flex flex-col h-full border-l-4 border-l-primary/40">
-            <div class="flex-grow space-y-8">
+        <div class="glass-card p-8 border-l-4 border-l-primary/40">
+            <div class="space-y-8">
                 <div class="flex items-center gap-5">
                     <div class="w-14 h-14 bg-rose-500/10 text-rose-400 rounded-2xl flex items-center justify-center shadow-inner border border-rose-500/20">
                         <span class="material-symbols-outlined text-3xl">description</span>
@@ -318,7 +363,7 @@ if st.session_state.active_tab == "Retriever":
                     <div class="flex justify-between items-end">
                         <div class="space-y-1">
                             <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Metadata</p>
-                            <p class="text-sm font-semibold text-slate-300">{file_size:.2f} MB • PDF 1.7</p>
+                            <p class="text-sm font-semibold text-slate-300">{file_size:.2f} MB &bull; PDF</p>
                         </div>
                         <div class="text-right space-y-1">
                             <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status</p>
@@ -338,27 +383,33 @@ if st.session_state.active_tab == "Retriever":
         """, unsafe_allow_html=True)
 
         if uploaded_file:
-            if st.button("Begin Neural Indexing", key="btn_p", use_container_width=True):
+            if st.button("Begin Neural Indexing", type="primary", use_container_width=True):
                 with st.spinner("Analyzing Document Topology..."):
                     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                        tmp.write(uploaded_file.getvalue()); tmp_path = tmp.name
+                        tmp.write(uploaded_file.getvalue())
+                        tmp_path = tmp.name
                     try:
-                        loader = PyPDFLoader(tmp_path); docs = loader.load()
-                        splits = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200).split_documents(docs)
-                        Chroma.from_documents(documents=splits, embedding=embeddings, persist_directory=DB_DIR)
-                        st.session_state.process_status = "STABLE"; st.success("Knowledge Ingested Successfully")
+                        loader = PyPDFLoader(tmp_path)
+                        docs   = loader.load()
+                        splits = RecursiveCharacterTextSplitter(
+                            chunk_size=1000, chunk_overlap=200
+                        ).split_documents(docs)
+                        Chroma.from_documents(
+                            documents=splits,
+                            embedding=embeddings,
+                            persist_directory=DB_DIR
+                        )
+                        st.session_state.process_status = "STABLE"
+                        st.success("Knowledge Ingested Successfully")
                         st.rerun()
-                    finally: os.unlink(tmp_path)
-        
-        st.markdown("""
-            <div class="mt-8 pt-6 border-t border-white/5 flex items-center gap-3 opacity-60">
-                <span class="material-symbols-outlined text-sm text-slate-400">info</span>
-                <p class="text-[10px] text-slate-400 italic">Vectorization uses HuggingFace all-MiniLM-L6-v2</p>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True) # Closes space-y-12
+                    finally:
+                        os.unlink(tmp_path)
 
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ==============================================================================
+# TAB: SYSTEM INTEGRITY (Verify DB)
+# ==============================================================================
 elif st.session_state.active_tab == "Verify DB":
     st.markdown("""
     <div class="space-y-10">
@@ -375,76 +426,77 @@ elif st.session_state.active_tab == "Verify DB":
             </div>
         </div>
     """, unsafe_allow_html=True)
-    
+
     if os.path.exists(DB_DIR):
         try:
-            db = chromadb.PersistentClient(path=DB_DIR)
-            collections = db.list_collections()
-            if collections:
-                collection = db.get_collection(collections[0].name)
-                data = collection.get(include=['documents', 'embeddings'], limit=3)
-                v_cols = st.columns(2, gap="large")
-                with v_cols[0]:
-                    chunks_html = ""
-                    for i, doc in enumerate(data['documents']):
-                        chunks_html += f"""
-                        <div class="p-5 bg-slate-900/50 rounded-2xl border border-white/5 space-y-3 group hover:border-primary/30 transition-all">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-primary opacity-40 group-hover:opacity-100 transition-opacity"></span>
-                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Chunk {i+1}</span>
-                            </div>
-                            <p class="text-sm text-slate-400 italic leading-relaxed">"{doc[:240]}..."</p>
+            db = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
+            collection = db._collection
+            data = collection.get(include=['documents', 'embeddings'], limit=3)
+
+            v_cols = st.columns(2, gap="large")
+
+            with v_cols[0]:
+                chunks_html = ""
+                for i, doc in enumerate(data["documents"]):
+                    chunks_html += f"""
+                    <div class="p-5 bg-slate-900/50 rounded-2xl border border-white/5 space-y-3 group hover:border-primary/30 transition-all">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-primary opacity-40 group-hover:opacity-100 transition-opacity"></span>
+                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Chunk {i + 1}</span>
                         </div>
-                        """
-                    
-                    with st.expander("🔍 View Knowledge Segments", expanded=False):
-                        st.markdown(f"""
-                        <div class="glass-card overflow-hidden">
-                            <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
-                                <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-primary">segment</span>
-                                    Knowledge Segments
-                                </span>
-                                <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">{len(data['documents'])} Nodes</span>
-                            </div>
-                            <div class="p-8 space-y-6">
-                                {chunks_html}
-                            </div>
+                        <p class="text-sm text-slate-400 italic leading-relaxed">"{doc[:240]}..."</p>
+                    </div>
+                    """
+                with st.expander("🔍 View Knowledge Segments", expanded=False):
+                    st.markdown(f"""
+                    <div class="glass-card overflow-hidden">
+                        <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
+                            <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">segment</span>
+                                Knowledge Segments
+                            </span>
+                            <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">{len(data["documents"])} Nodes</span>
                         </div>
-                        """, unsafe_allow_html=True)
-                
-                with v_cols[1]:
-                    embeddings_html = ""
-                    for i, emb in enumerate(data['embeddings']):
-                        embeddings_html += f"""
-                        <div class="p-5 bg-slate-950 rounded-2xl border border-white/5 space-y-3 group hover:border-primary/30 transition-all">
-                            <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-primary-400 opacity-40 group-hover:opacity-100 transition-opacity"></span>
-                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Embedding {i+1}</span>
-                            </div>
-                            <p class="text-[9px] font-mono text-primary/60 break-all leading-tight">[{", ".join([f"{x:.3f}" for x in emb[:15]])}...]</p>
+                        <div class="p-8 space-y-6">{chunks_html}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            with v_cols[1]:
+                embeddings_html = ""
+                for i, emb in enumerate(data["embeddings"]):
+                    embeddings_html += f"""
+                    <div class="p-5 bg-slate-950 rounded-2xl border border-white/5 space-y-3 group hover:border-primary/30 transition-all">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-primary-400 opacity-40 group-hover:opacity-100 transition-opacity"></span>
+                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Embedding {i + 1}</span>
                         </div>
-                        """
-                    
-                    with st.expander("📊 View Latent Embeddings", expanded=False):
-                        st.markdown(f"""
-                        <div class="glass-card overflow-hidden">
-                            <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
-                                <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
-                                    <span class="material-symbols-outlined text-primary">analytics</span>
-                                    Vector Embeddings
-                                </span>
-                                <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">d=384</span>
-                            </div>
-                            <div class="p-8 space-y-6">
-                                {embeddings_html}
-                            </div>
+                        <p class="text-[9px] font-mono text-primary/60 break-all leading-tight">[{", ".join([f"{x:.3f}" for x in emb[:15]])}...]</p>
+                    </div>
+                    """
+                with st.expander("📊 View Latent Embeddings", expanded=False):
+                    st.markdown(f"""
+                    <div class="glass-card overflow-hidden">
+                        <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
+                            <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">analytics</span>
+                                Vector Embeddings
+                            </span>
+                            <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">d=384</span>
                         </div>
-                        """, unsafe_allow_html=True)
-        except Exception as e: st.error(f"Integrity check failed: {e}")
-    else: st.info("Intelligence core is offline. Please ingest documents to initialize the vector database.")
+                        <div class="p-8 space-y-6">{embeddings_html}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+        except Exception as e:
+            st.error(f"Integrity check failed: {e}")
+    else:
+        st.info("Intelligence core is offline. Please ingest documents to initialize the vector database.")
+
     st.markdown("</div>", unsafe_allow_html=True)
 
+# ==============================================================================
+# TAB: DASHBOARD (Intelligent Query)
+# ==============================================================================
 elif st.session_state.active_tab == "Dashboard":
     st.markdown("""
     <div class="space-y-10">
@@ -456,47 +508,52 @@ elif st.session_state.active_tab == "Dashboard":
             <p class="text-slate-400 text-lg max-w-2xl font-medium">Probe the latent space of your ingested documents with precise, natural language inquiries.</p>
         </div>
     """, unsafe_allow_html=True)
-    
-    # Custom Query Input Styling
-    st.markdown("""
-    <div class="relative group mt-8">
-        <div class="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-500"></div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    q_in = st.text_input("Ask...", placeholder="What are the key risk factors mentioned in the portfolio report?", label_visibility="collapsed")
-    
+
+    q_in = st.text_input(
+        "Ask...",
+        placeholder="What are the key risk factors mentioned in the portfolio report?",
+        label_visibility="collapsed"
+    )
+
     q_cols = st.columns([1, 4, 1])
     with q_cols[1]:
-        if st.button("Execute Neural Search", key="btn_q", use_container_width=True):
+        if st.button("Execute Neural Search", type="primary", use_container_width=True):
             if q_in and os.path.exists(DB_DIR):
                 with st.spinner("Synthesizing Insights..."):
-                    vs = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
-                    chain = create_retrieval_chain(vs.as_retriever(), create_stuff_documents_chain(get_llm(), ChatPromptTemplate.from_messages([("system", "Answer with context: \n\n{context}"), ("human", "{input}")])))
+                    vs    = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
+                    chain = create_retrieval_chain(
+                        vs.as_retriever(),
+                        create_stuff_documents_chain(
+                            get_llm(),
+                            ChatPromptTemplate.from_messages([
+                                ("system", "Answer with context:\n\n{context}"),
+                                ("human",  "{input}"),
+                            ])
+                        )
+                    )
                     st.session_state.ans = chain.invoke({"input": q_in})
-            elif not os.path.exists(DB_DIR): st.error("No knowledge base found. Please ingest documents first.")
-    
+            elif not os.path.exists(DB_DIR):
+                st.error("No knowledge base found. Please ingest documents first.")
+
     if "ans" in st.session_state:
         res = st.session_state.ans
-        
-        # Build Sources HTML
+
         sources_html = ""
         for i, doc in enumerate(res["context"][:2]):
             sources_html += f"""
             <div class="glass-card p-6 border-l-2 border-l-primary/30 hover:border-l-primary transition-all">
                 <div class="flex items-center gap-3 mb-3">
-                    <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Context node {i+1}</span>
+                    <span class="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Context node {i + 1}</span>
                     <div class="h-px flex-grow bg-white/5"></div>
                 </div>
                 <p class="text-sm italic text-slate-400 leading-relaxed font-medium">"{doc.page_content[:320]}..."</p>
             </div>
             """
 
-        # Full Results Block
         st.markdown(f"""
         <div class="glass-card p-8 lg:p-12 space-y-12 mt-8 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10"></div>
-            
+
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="flex items-center gap-4">
                     <div class="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-slate-950 shadow-xl shadow-primary/20 rotate-3">
@@ -511,7 +568,7 @@ elif st.session_state.active_tab == "Dashboard":
                     <div class="px-4 py-2 bg-slate-900 rounded-xl border border-white/5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">v2.4 STABLE</div>
                 </div>
             </div>
-            
+
             <div class="space-y-8">
                 <div class="flex items-center gap-4">
                     <p class="font-label text-[10px] uppercase tracking-[0.4em] text-primary font-black whitespace-nowrap">Retrieved Context</p>
@@ -536,72 +593,20 @@ elif st.session_state.active_tab == "Dashboard":
                     </div>
                 </div>
             </div>
-            
+
             <div class="mt-16 flex flex-wrap gap-4 pt-10 border-t border-white/5">
                 <button class="bg-primary hover:bg-primary-600 text-slate-950 font-bold px-8 py-4 rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/10 flex items-center gap-3">
-                    <span class="material-symbols-outlined text-xl">file_download</span> 
+                    <span class="material-symbols-outlined text-xl">file_download</span>
                     <span>Export Analysis</span>
                 </button>
                 <button class="bg-white/5 hover:bg-white/10 text-white font-bold px-8 py-4 rounded-2xl border border-white/10 transition-all active:scale-95 flex items-center gap-3">
-                    <span class="material-symbols-outlined text-xl">share</span> 
+                    <span class="material-symbols-outlined text-xl">share</span>
                     <span>Share Insights</span>
                 </button>
             </div>
         </div>
         """, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True) # Closes space-y-10
 
-st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# --- GLOBAL BUTTON & INPUT STYLES ---
-st.markdown("""
-<style>
-    .stButton>button {
-        border-radius: 16px !important;
-        font-family: 'Outfit', sans-serif !important;
-        font-weight: 600 !important;
-        transition: all 0.3s !important;
-    }
-    
-    /* Primary Action Buttons */
-    .stButton[key="btn_p"]>button, .stButton[key="btn_q"]>button {
-        background: #5e66ff !important;
-        color: #060e20 !important;
-        padding: 1rem !important;
-        border: none !important;
-        box-shadow: 0 10px 20px rgba(94, 102, 255, 0.2) !important;
-    }
-    .stButton[key="btn_p"]>button:hover, .stButton[key="btn_q"]>button:hover {
-        background: #7d88ff !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 15px 30px rgba(94, 102, 255, 0.3) !important;
-    }
-    
-    /* Text Inputs */
-    .stTextInput input {
-        background-color: #091328 !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        border-radius: 20px !important;
-        padding: 1.5rem 2rem !important;
-        color: #fff !important;
-        font-family: 'Inter', sans-serif !important;
-        font-size: 1.1rem !important;
-        transition: all 0.3s !important;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.2) !important;
-    }
-    .stTextInput input:focus {
-        border-color: #5e66ff !important;
-        background-color: #0f1930 !important;
-        box-shadow: 0 0 0 4px rgba(94, 102, 255, 0.1) !important;
-    }
-    
-    /* Success/Error override */
-    .stSuccess, .stError, .stInfo {
-        background: rgba(15, 25, 48, 0.8) !important;
-        backdrop-filter: blur(10px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        border-radius: 16px !important;
-        color: #dee5ff !important;
-    }
-</style>
-""", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
