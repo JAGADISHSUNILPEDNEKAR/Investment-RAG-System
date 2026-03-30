@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import tempfile
+import textwrap
 from dotenv import load_dotenv
 
 import chromadb
@@ -227,7 +228,7 @@ def get_embeddings():
 # FIX #5: Corrected model name from "gemini-flash-latest" to "gemini-1.5-flash-latest"
 @st.cache_resource
 def get_llm():
-    return ChatGoogleGenerativeAI(model="gemini-1.5-flash-latest", temperature=0.2)
+    return ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.2)
 
 embeddings = get_embeddings()
 DB_DIR = "./chroma_db"
@@ -377,7 +378,7 @@ if st.session_state.active_tab == "Retriever":
     r_cols = st.columns([1.8, 1], gap="large")
 
     with r_cols[0]:
-        st.markdown("""
+        st.markdown(textwrap.dedent("""
         <div class="glass-card p-12 flex flex-col items-center justify-center text-center space-y-8 relative overflow-hidden group">
             <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             <div class="w-24 h-24 bg-slate-900 rounded-[32px] flex items-center justify-center text-primary-400 border border-white/5 shadow-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
@@ -391,7 +392,7 @@ if st.session_state.active_tab == "Retriever":
                 Browse Files
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
 
         uploaded_file = st.file_uploader("Upload", type="pdf", label_visibility="collapsed")
 
@@ -403,7 +404,7 @@ if st.session_state.active_tab == "Retriever":
         # FIX #2: Glass-card is fully self-contained in a single st.markdown call.
         # The Streamlit button is rendered outside the card, avoiding the unclosed-div
         # issue caused by mixing widget calls with custom HTML markup.
-        st.markdown(f"""
+        st.markdown(textwrap.dedent(f"""
         <div class="glass-card p-8 border-l-4 border-l-primary/40">
             <div class="space-y-8">
                 <div class="flex items-center gap-5">
@@ -436,7 +437,7 @@ if st.session_state.active_tab == "Retriever":
                 <p class="text-[10px] text-slate-400 italic">Vectorization uses HuggingFace all-MiniLM-L6-v2</p>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
 
         # FIX #1: Removed the duplicate info block that appeared here previously.
         # The button now renders cleanly beneath the closed glass-card div.
@@ -513,7 +514,7 @@ elif st.session_state.active_tab == "Verify DB":
                     </div>
                     """
                 with st.expander("🔍 View Knowledge Segments", expanded=False):
-                    st.markdown(f"""
+                    st.markdown(textwrap.dedent(f"""
                     <div class="glass-card overflow-hidden">
                         <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
                             <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
@@ -522,9 +523,9 @@ elif st.session_state.active_tab == "Verify DB":
                             </span>
                             <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">{len(data["documents"])} Nodes</span>
                         </div>
-                        <div class="p-8 space-y-6">{chunks_html}</div>
+                        <div class="p-8 space-y-6">{textwrap.dedent(chunks_html)}</div>
                     </div>
-                    """, unsafe_allow_html=True)
+                    """), unsafe_allow_html=True)
 
             with v_cols[1]:
                 embeddings_html = ""
@@ -539,7 +540,7 @@ elif st.session_state.active_tab == "Verify DB":
                     </div>
                     """
                 with st.expander("📊 View Latent Embeddings", expanded=False):
-                    st.markdown(f"""
+                    st.markdown(textwrap.dedent(f"""
                     <div class="glass-card overflow-hidden">
                         <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
                             <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
@@ -548,9 +549,9 @@ elif st.session_state.active_tab == "Verify DB":
                             </span>
                             <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">d=384</span>
                         </div>
-                        <div class="p-8 space-y-6">{embeddings_html}</div>
+                        <div class="p-8 space-y-6">{textwrap.dedent(embeddings_html)}</div>
                     </div>
-                    """, unsafe_allow_html=True)
+                    """), unsafe_allow_html=True)
 
         except Exception as e:
             st.error(f"Integrity check failed: {e}")
@@ -579,11 +580,11 @@ elif st.session_state.active_tab == "Dashboard":
         </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("""
+    st.markdown(textwrap.dedent("""
     <div class="relative group mt-8">
         <div class="absolute inset-0 bg-primary/20 blur-2xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity duration-500"></div>
     </div>
-    """, unsafe_allow_html=True)
+    """), unsafe_allow_html=True)
 
     q_in = st.text_input(
         "Ask...",
@@ -626,7 +627,7 @@ elif st.session_state.active_tab == "Dashboard":
             </div>
             """
 
-        st.markdown(f"""
+        st.markdown(textwrap.dedent(f"""
         <div class="glass-card p-8 lg:p-12 space-y-12 mt-8 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10"></div>
 
@@ -651,7 +652,7 @@ elif st.session_state.active_tab == "Dashboard":
                     <div class="h-px w-full bg-gradient-to-r from-primary/20 to-transparent"></div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {sources_html}
+                    {textwrap.dedent(sources_html)}
                 </div>
             </div>
 
@@ -681,7 +682,7 @@ elif st.session_state.active_tab == "Dashboard":
                 </button>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
