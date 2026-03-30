@@ -232,30 +232,31 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
 # --- CUSTOM HEADER ---
-st.markdown(f"""
-<div class="flex items-center justify-between px-10 py-6 bg-slate-950/50 backdrop-blur-md border-b border-white/5 sticky top-0 z-50">
-    <div class="flex items-center gap-10">
-        <span class="text-xl font-headline font-extrabold tracking-tighter bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">RAG ANALYZER</span>
-        <div class="hidden md:flex gap-8">
-            <span class="text-sm font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">Portfolio</span>
-            <span class="text-sm font-medium text-primary border-b-2 border-primary pb-1">Intelligence</span>
-            <span class="text-sm font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">Resources</span>
+with st.container():
+    st.markdown(f"""
+    <div class="flex items-center justify-between px-10 py-6 bg-slate-950/50 backdrop-blur-md border-b border-white/5 sticky top-0 z-50" style="height: 80px;">
+        <div class="flex items-center gap-10">
+            <span class="text-xl font-headline font-extrabold tracking-tighter bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">RAG ANALYZER</span>
+            <div class="hidden md:flex gap-8">
+                <span class="text-sm font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">Portfolio</span>
+                <span class="text-sm font-medium text-primary border-b-2 border-primary pb-1">Intelligence</span>
+                <span class="text-sm font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">Resources</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3 bg-slate-900 px-4 py-2 rounded-2xl border border-white/5" style="border-radius: 12px; padding: 6px 12px;">
+                <span class="relative flex h-2 w-2" style="width: 8px; height: 8px;">
+                    <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                <span class="text-[10px] uppercase tracking-widest text-primary-300 font-bold font-label" style="font-size: 10px;">{st.session_state.process_status}</span>
+            </div>
+            <div class="rounded-full border-2 border-primary/20 p-0.5" style="width: 44px; height: 44px; border-radius: 50%; overflow: hidden;">
+                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHg42IWLey4S15SqkykRxyXZ74kddwgq21vEX9uiG7QWnY_jlHlpQHBelnSrAMrvANaeXGQBJZ2qZn0f6kOOvLsoq7Q-cq379cmg6TdqL4rT_0XzNRWi4dIwrFilyDGKhr5yCyohoXL1xviVF5bUuRt8Yifxe-VxcnY4D8YLCtxxYVNw8POr7pS-0JH8PXge7dq7HkrecSoLkD56oNshJ_iv4w7kMyv3riQuGn5LZXVdB1-NXyu6BOa6vvncteixXZfnbw3ewfQKE" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
         </div>
     </div>
-    <div class="flex items-center gap-6">
-        <div class="flex items-center gap-3 bg-slate-900 px-4 py-2 rounded-2xl border border-white/5">
-            <span class="relative flex h-2 w-2">
-                <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-            </span>
-            <span class="text-[10px] uppercase tracking-widest text-primary-300 font-bold font-label">{st.session_state.process_status}</span>
-        </div>
-        <div class="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHg42IWLey4S15SqkykRxyXZ74kddwgq21vEX9uiG7QWnY_jlHlpQHBelnSrAMrvANaeXGQBJZ2qZn0f6kOOvLsoq7Q-cq379cmg6TdqL4rT_0XzNRWi4dIwrFilyDGKhr5yCyohoXL1xviVF5bUuRt8Yifxe-VxcnY4D8YLCtxxYVNw8POr7pS-0JH8PXge7dq7HkrecSoLkD56oNshJ_iv4w7kMyv3riQuGn5LZXVdB1-NXyu6BOa6vvncteixXZfnbw3ewfQKE" class="w-full h-full rounded-full object-cover shadow-lg">
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 # --- MAIN CONTENT ---
 st.markdown('<div class="main-content">', unsafe_allow_html=True)
