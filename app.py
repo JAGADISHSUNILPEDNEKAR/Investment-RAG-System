@@ -263,72 +263,93 @@ st.markdown('<div class="main-content">', unsafe_allow_html=True)
 if st.session_state.active_tab == "Retriever":
     st.markdown("""
     <div class="space-y-12">
-        <div class="space-y-2">
-            <h1 class="text-4xl font-extrabold font-headline tracking-tighter text-[#dee5ff]">Knowledge Retrieval</h1>
-            <p class="text-[#a3aac4] text-lg">Initialize your analysis by processing financial literature and investment reports.</p>
+        <div class="flex items-end justify-between">
+            <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold tracking-[0.2em] rounded-full uppercase">Ingestion Engine</span>
+                </div>
+                <h1 class="text-5xl font-black font-headline tracking-tight text-white leading-tight">Knowledge Base</h1>
+                <p class="text-slate-400 text-lg max-w-2xl font-medium">Initialize your analysis by processing financial literature and institutional reports into the neural vector engine.</p>
+            </div>
         </div>
     """, unsafe_allow_html=True)
     
-    r_cols = st.columns([2, 1], gap="large")
+    r_cols = st.columns([1.8, 1], gap="large")
     with r_cols[0]:
-        uploaded_file = st.file_uploader("Upload PDF", type="pdf", label_visibility="collapsed")
         st.markdown("""
-        <div class="bg-[#091328] p-16 rounded-xl border-2 border-dashed border-[#40485d]/30 flex flex-col items-center justify-center text-center space-y-4 group hover:border-[#9fa7ff]/50 transition-all cursor-pointer">
-            <div class="w-16 h-16 bg-[#192540] rounded-full flex items-center justify-center text-[#9fa7ff] group-hover:scale-110 transition-transform">
-                <span class="material-symbols-outlined text-3xl">upload_file</span>
+        <div class="glass-card p-12 flex flex-col items-center justify-center text-center space-y-8 relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="w-24 h-24 bg-slate-900 rounded-[32px] flex items-center justify-center text-primary-400 border border-white/5 shadow-2xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                <span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">cloud_upload</span>
             </div>
-            <div>
-                <h3 class="text-xl font-bold font-headline text-[#dee5ff]">Drag investment docs here</h3>
-                <p class="text-[#a3aac4]">Supports PDF, DOCX up to 50MB</p>
+            <div class="space-y-3">
+                <h3 class="text-2xl font-bold font-headline text-white tracking-tight">Drop investment documents here</h3>
+                <p class="text-slate-400 font-medium">Maximum file size: <span class="text-white">50MB</span> • Supports <span class="text-white">PDF, DOCX</span></p>
+            </div>
+            <div class="px-8 py-3 bg-white/5 rounded-2xl border border-white/10 group-hover:border-primary/30 transition-all font-semibold text-slate-300">
+                Browse Files
             </div>
         </div>
         """, unsafe_allow_html=True)
+        
+        # Hidden file uploader layered on top or styled
+        uploaded_file = st.file_uploader("Upload", type="pdf", label_visibility="collapsed")
 
     with r_cols[1]:
         # Build Document Status HTML
-        status_text = "File selected" if uploaded_file else "No file selected"
+        status_text = "Ready for Ingestion" if uploaded_file else "Awaiting Selection"
+        file_name = uploaded_file.name if uploaded_file else "-"
         file_size = (uploaded_file.size/1024/1024) if uploaded_file else 0
         
         st.markdown(f"""
-        <div class="bg-[#0f1930] p-8 rounded-xl flex flex-col justify-between h-full border border-white/5">
-            <div class="space-y-6">
-                <div class="flex items-start justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-[#a70138]/20 text-[#ff6e84] rounded-xl flex items-center justify-center shadow-lg">
-                            <span class="material-symbols-outlined text-2xl">picture_as_pdf</span>
-                        </div>
-                        <div>
-                            <p class="font-bold text-[#dee5ff] text-base truncate w-40">{status_text}</p>
-                            <p class="text-[10px] font-label text-slate-500 uppercase tracking-widest">{file_size:.1f} MB • PDF ARCHIVE</p>
-                        </div>
+        <div class="glass-card p-8 flex flex-col h-full border-l-4 border-l-primary/40">
+            <div class="flex-grow space-y-8">
+                <div class="flex items-center gap-5">
+                    <div class="w-14 h-14 bg-rose-500/10 text-rose-400 rounded-2xl flex items-center justify-center shadow-inner border border-rose-500/20">
+                        <span class="material-symbols-outlined text-3xl">description</span>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Active Artifact</p>
+                        <p class="font-bold text-white text-lg truncate w-48 font-headline">{file_name}</p>
                     </div>
                 </div>
                 
-                <div class="space-y-2">
-                    <div class="flex justify-between text-[10px] font-label text-slate-400">
-                        <span>PROCESSING ENGINE</span>
-                        <span>v2.4 STABLE</span>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-end">
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Metadata</p>
+                            <p class="text-sm font-semibold text-slate-300">{file_size:.2f} MB • PDF 1.7</p>
+                        </div>
+                        <div class="text-right space-y-1">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Status</p>
+                            <p class="text-sm font-bold text-primary-400">{status_text}</p>
+                        </div>
                     </div>
-                    <div class="w-full h-1 bg-white/5 rounded-full overflow-hidden">
-                        <div class="h-full bg-[#9fa7ff] w-1/3 opacity-50"></div>
+                    <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-white/5">
+                        <div class="h-full bg-gradient-to-r from-primary-600 to-primary-400 w-full opacity-30"></div>
                     </div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
 
-        if uploaded_file and st.button("Initialize Neural Index", key="btn_p"):
-            with st.spinner("Analyzing Document Topology..."):
-                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-                    tmp.write(uploaded_file.getvalue()); tmp_path = tmp.name
-                try:
-                    loader = PyPDFLoader(tmp_path); docs = loader.load()
-                    splits = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200).split_documents(docs)
-                    Chroma.from_documents(documents=splits, embedding=embeddings, persist_directory=DB_DIR)
-                    st.session_state.process_status = "READY"; st.success("Neural Indexing Complete")
-                finally: os.unlink(tmp_path)
+        if uploaded_file:
+            if st.button("Begin Neural Indexing", key="btn_p", use_container_width=True):
+                with st.spinner("Analyzing Document Topology..."):
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                        tmp.write(uploaded_file.getvalue()); tmp_path = tmp.name
+                    try:
+                        loader = PyPDFLoader(tmp_path); docs = loader.load()
+                        splits = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200).split_documents(docs)
+                        Chroma.from_documents(documents=splits, embedding=embeddings, persist_directory=DB_DIR)
+                        st.session_state.process_status = "STABLE"; st.success("Knowledge Ingested Successfully")
+                        st.rerun()
+                    finally: os.unlink(tmp_path)
         
         st.markdown("""
-            <p class="text-[10px] text-[#a3aac4] mt-6 italic text-center opacity-60">Click above to start RAG indexing</p>
+            <div class="mt-8 pt-6 border-t border-white/5 flex items-center gap-3 opacity-60">
+                <span class="material-symbols-outlined text-sm text-slate-400">info</span>
+                <p class="text-[10px] text-slate-400 italic">Vectorization uses HuggingFace all-MiniLM-L6-v2</p>
+            </div>
         </div>
         """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True) # Closes space-y-12
