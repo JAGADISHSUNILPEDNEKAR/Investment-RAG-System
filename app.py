@@ -326,7 +326,7 @@ with st.sidebar:
     </script>
     """, unsafe_allow_html=True)
 
-    st.markdown("""
+    st.markdown(f"""
     <div class="mt-auto mb-8 pt-6 px-2 border-t border-white/5">
         <div class="flex items-center gap-3 text-slate-400 text-xs px-2 py-3 bg-slate-800/40 rounded-xl">
             <span class="relative flex h-2 w-2">
