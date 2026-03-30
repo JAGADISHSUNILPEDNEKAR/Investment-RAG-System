@@ -653,7 +653,8 @@ Context:
 </div>
 """
 
-        st.markdown(textwrap.dedent(f"""
+        # --- Synthesis Report: Header + Context Nodes (pure HTML → st.html) ---
+        st.html(f"""
         <div class="glass-card p-8 lg:p-12 space-y-12 mt-8 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10"></div>
 
@@ -681,34 +682,38 @@ Context:
 {sources_html}
                 </div>
             </div>
+        </div>
+        """)
 
-            <div class="pt-16 border-t border-white/5 relative">
-                <div class="absolute -top-5 left-0 bg-slate-950 px-6 py-2 text-[10px] font-black text-primary border border-primary/30 rounded-full flex items-center gap-3">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                    </span>
-                    ANALYSIS FINALIZED
-                </div>
-                <div class="prose prose-invert max-w-none">
-                    <div class="text-xl leading-relaxed text-slate-200 font-medium font-body opacity-95">
-                        {res["answer"]}
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-16 flex flex-wrap gap-4 pt-10 border-t border-white/5">
-                <button class="bg-primary hover:bg-primary-600 text-slate-950 font-bold px-8 py-4 rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/10 flex items-center gap-3">
-                    <span class="material-symbols-outlined text-xl">file_download</span>
-                    <span>Export Analysis</span>
-                </button>
-                <button class="bg-white/5 hover:bg-white/10 text-white font-bold px-8 py-4 rounded-2xl border border-white/10 transition-all active:scale-95 flex items-center gap-3">
-                    <span class="material-symbols-outlined text-xl">share</span>
-                    <span>Share Insights</span>
-                </button>
+        # --- Analysis Finalized badge (pure HTML → st.html) ---
+        st.html("""
+        <div style="margin-top: -8px; padding: 24px 32px 0 32px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <span class="relative flex h-2 w-2" style="display: inline-flex; position: relative; height: 8px; width: 8px;">
+                    <span style="position: absolute; display: inline-flex; height: 100%; width: 100%; border-radius: 9999px; background-color: #5e66ff; opacity: 0.75; animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;"></span>
+                    <span style="position: relative; display: inline-flex; border-radius: 9999px; height: 8px; width: 8px; background-color: #5e66ff;"></span>
+                </span>
+                <span style="font-size: 10px; font-weight: 900; color: #5e66ff; letter-spacing: 0.2em; text-transform: uppercase; font-family: 'Space Grotesk', sans-serif;">ANALYSIS FINALIZED</span>
             </div>
         </div>
-        """), unsafe_allow_html=True)
+        """)
+
+        # --- LLM Answer (contains markdown → st.markdown, NOT st.html) ---
+        st.markdown(res["answer"])
+
+        # --- Action Buttons (pure HTML → st.html) ---
+        st.html("""
+        <div style="margin-top: 32px; display: flex; flex-wrap: wrap; gap: 16px; padding: 24px 0; border-top: 1px solid rgba(255,255,255,0.05);">
+            <button style="background: #5e66ff; color: #060e20; font-weight: 700; padding: 16px 32px; border-radius: 16px; border: none; cursor: pointer; display: flex; align-items: center; gap: 12px; font-family: 'Outfit', sans-serif; font-size: 14px; box-shadow: 0 10px 20px rgba(94,102,255,0.1); transition: all 0.3s;">
+                <span class="material-symbols-outlined" style="font-size: 20px;">file_download</span>
+                <span>Export Analysis</span>
+            </button>
+            <button style="background: rgba(255,255,255,0.05); color: #fff; font-weight: 700; padding: 16px 32px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; display: flex; align-items: center; gap: 12px; font-family: 'Outfit', sans-serif; font-size: 14px; transition: all 0.3s;">
+                <span class="material-symbols-outlined" style="font-size: 20px;">share</span>
+                <span>Share Insights</span>
+            </button>
+        </div>
+        """)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
