@@ -78,9 +78,9 @@ tailwind.config = {
     }
 
     .block-container {
-        padding: 10rem var(--content-gap) 6rem calc(var(--content-gap) + 60px) !important;
-        max-width: 1600px !important;
-        margin: 0 auto;
+        padding: 120px 4rem 4rem calc(var(--sidebar-width) + 4rem) !important;
+        max-width: 100% !important;
+        margin: 0;
     }
 
     #MainMenu { visibility: hidden; }
@@ -190,6 +190,30 @@ tailwind.config = {
         border: 1px solid rgba(255, 255, 255, 0.05) !important;
         border-radius: 16px !important;
         color: #dee5ff !important;
+    }
+
+    /* Fixed Modern Header */
+    .precision-header {
+        position: fixed !important;
+        top: 0 !important;
+        right: 0 !important;
+        left: 280px !important; /* Sidebar width from line 70 */
+        height: 80px !important;
+        background: rgba(6, 14, 32, 0.6) !important;
+        backdrop-filter: blur(24px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        z-index: 999991 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 4rem !important;
+        transition: all 0.3s ease !important;
+    }
+
+    @media (max-width: 768px) {
+        .precision-header { left: 0 !important; padding: 0 1.5rem !important; }
+        .block-container { padding: 120px 1.5rem 4rem 1.5rem !important; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -302,31 +326,29 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-# --- CUSTOM HEADER ---
-with st.container():
-    st.markdown(f"""
-    <div class="flex items-center justify-between px-8 py-4 bg-slate-950/40 backdrop-blur-2xl border-b border-white/5 sticky top-0 z-50" style="height: 70px;">
-        <div class="flex items-center gap-8">
-            <span class="text-lg font-headline font-black tracking-tighter bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">PRECISION AI</span>
-            <div class="hidden lg:flex gap-6 border-l border-white/10 pl-8">
-                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-primary transition-colors cursor-pointer">Intelligence Layer</span>
-                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-primary transition-colors cursor-pointer">Neural Engine</span>
-            </div>
-        </div>
-        <div class="flex items-center gap-6">
-            <div class="flex items-center gap-3 bg-white/5 px-4 py-1.5 rounded-full border border-white/10">
-                <span class="relative flex h-1.5 w-1.5">
-                    <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary"></span>
-                </span>
-                <span class="text-[10px] uppercase font-bold tracking-widest text-primary/80">{st.session_state.process_status}</span>
-            </div>
-            <div class="rounded-full border border-white/20 p-0.5 hover:border-primary/50 transition-all cursor-pointer shadow-lg shadow-black/40" style="width: 38px; height: 38px; border-radius: 50%; overflow: hidden;">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHg42IWLey4S15SqkykRxyXZ74kddwgq21vEX9uiG7QWnY_jlHlpQHBelnSrAMrvANaeXGQBJZ2qZn0f6kOOvLsoq7Q-cq379cmg6TdqL4rT_0XzNRWi4dIwrFilyDGKhr5yCyohoXL1xviVF5bUuRt8Yifxe-VxcnY4D8YLCtxxYVNw8POr7pS-0JH8PXge7dq7HkrecSoLkD56oNshJ_iv4w7kMyv3riQuGn5LZXVdB1-NXyu6BOa6vvncteixXZfnbw3ewfQKE" style="width: 100%; height: 100%; object-fit: cover;">
-            </div>
+# --- FIXED MODERN HEADER ---
+st.markdown(f"""
+<div class="precision-header">
+    <div class="flex items-center gap-6">
+        <span class="text-xl font-headline font-black tracking-tighter bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">PRECISION AI</span>
+        <div class="hidden lg:flex items-center gap-4 border-l border-white/10 pl-6 h-6">
+            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest leading-none">Intelligence Engine</span>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2.5 bg-white/5 px-4 py-1.5 rounded-full border border-white/10 shadow-inner">
+            <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-400/90 leading-none">{st.session_state.process_status}</span>
+        </div>
+        <div class="rounded-full border border-white/20 p-0.5 hover:border-primary/50 hover:scale-105 transition-all cursor-pointer ring-4 ring-black/20" style="width: 40px; height: 40px; overflow: hidden;">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHg42IWLey4S15SqkykRxyXZ74kddwgq21vEX9uiG7QWnY_jlHlpQHBelnSrAMrvANaeXGQBJZ2qZn0f6kOOvLsoq7Q-cq379cmg6TdqL4rT_0XzNRWi4dIwrFilyDGKhr5yCyohoXL1xviVF5bUuRt8Yifxe-VxcnY4D8YLCtxxYVNw8POr7pS-0JH8PXge7dq7HkrecSoLkD56oNshJ_iv4w7kMyv3riQuGn5LZXVdB1-NXyu6BOa6vvncteixXZfnbw3ewfQKE" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 # --- MAIN CONTENT ---
 # (Removed the broken main-content div wrapper)
