@@ -77,10 +77,11 @@ tailwind.config = {
         font-family: 'Inter', sans-serif;
     }
 
-    .block-container {
-        padding: 100px 4rem 4rem calc(var(--sidebar-width) + 1.5rem) !important;
-        max-width: 100% !important;
-        margin: 0;
+    div[data-testid="stAppViewContainer"] section.main div.block-container {
+        padding: 90px 4rem 4rem 312px !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        margin-right: auto !important;
     }
 
     #MainMenu { visibility: hidden; }
@@ -207,7 +208,7 @@ tailwind.config = {
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
-        padding: 0 4rem !important;
+        padding: 0 32px !important; /* 32px horizontal padding */
         transition: all 0.3s ease !important;
     }
 
