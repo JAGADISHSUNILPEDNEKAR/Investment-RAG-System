@@ -78,19 +78,9 @@ tailwind.config = {
     }
 
     .block-container {
-        padding: 100px 5rem 4rem 540px !important;
+        padding: 100px 4rem 4rem calc(var(--sidebar-width) + 4rem) !important;
         max-width: 100% !important;
         margin: 0;
-    }
-
-    /* Reduce vertical padding in columns to keep things tight */
-    .stHorizontalBlock {
-        gap: 3rem !important;
-    }
-
-    /* Target the main content to force it left if needed */
-    .stMain > div {
-        max-width: 1400px !important;
     }
 
     #MainMenu { visibility: hidden; }
