@@ -68,7 +68,7 @@ tailwind.config = {
         --glass-bg: rgba(15, 25, 48, 0.7);
         --glass-border: rgba(255, 255, 255, 0.08);
         --sidebar-width: 280px;
-        --content-gap: 80px;
+        --content-gap: 100px;
     }
 
     .stApp {
@@ -88,15 +88,15 @@ tailwind.config = {
     /* Docked Sidebar */
     [data-testid="stSidebar"] {
         background-color: #091328 !important;
-        border-right: 1px solid var(--glass-border);
+        border-right: 1px solid rgba(255, 255, 255, 0.12) !important;
         width: var(--sidebar-width) !important;
-        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        box-shadow: 20px 0 60px rgba(0,0,0,0.6);
     }
     [data-testid="stSidebarNav"] { display: none !important; }
 
     /* Main Content Wrapper */
     .main-content {
-        padding: 4rem var(--content-gap) 4rem calc(var(--content-gap) + 20px);
+        padding: 5rem var(--content-gap) 5rem calc(var(--content-gap) + 40px);
         max-width: 1600px;
         margin: 0 auto;
         animation: fadeIn 0.8s ease-out;
