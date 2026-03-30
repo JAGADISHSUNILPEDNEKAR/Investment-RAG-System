@@ -494,17 +494,17 @@ elif st.session_state.active_tab == "Dashboard":
 
         # Full Results Block
         st.markdown(f"""
-        <div class="glass-card p-10 lg:p-16 space-y-16 mt-16 relative overflow-hidden">
+        <div class="glass-card p-8 lg:p-12 space-y-12 mt-8 relative overflow-hidden">
             <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] -z-10"></div>
             
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                <div class="flex items-center gap-5">
-                    <div class="w-16 h-16 bg-primary rounded-3xl flex items-center justify-center text-slate-950 shadow-2xl shadow-primary/20 rotate-6">
-                        <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">insights</span>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center text-slate-950 shadow-xl shadow-primary/20 rotate-3">
+                        <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">insights</span>
                     </div>
                     <div>
-                        <h3 class="font-headline text-3xl font-black text-white tracking-tight">Synthesis Report</h3>
-                        <p class="text-slate-400 font-medium">Generated from multidimensional vector retrieval</p>
+                        <h3 class="font-headline text-2xl font-black text-white tracking-tight">Synthesis Report</h3>
+                        <p class="text-slate-400 text-xs font-medium">Verified Neural Integration Analysis</p>
                     </div>
                 </div>
                 <div class="flex gap-3">
