@@ -78,7 +78,7 @@ tailwind.config = {
     }
 
     .block-container {
-        padding: 100px 4rem 4rem calc(var(--sidebar-width) + 4rem) !important;
+        padding: 100px 4rem 4rem calc(var(--sidebar-width) + 1.5rem) !important;
         max-width: 100% !important;
         margin: 0;
     }
