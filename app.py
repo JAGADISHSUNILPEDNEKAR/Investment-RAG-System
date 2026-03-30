@@ -78,7 +78,7 @@ tailwind.config = {
     }
 
     .block-container {
-        padding: 6rem var(--content-gap) 6rem calc(var(--content-gap) + 60px) !important;
+        padding: 10rem var(--content-gap) 6rem calc(var(--content-gap) + 60px) !important;
         max-width: 1600px !important;
         margin: 0 auto;
     }
@@ -107,11 +107,11 @@ tailwind.config = {
 
     /* Glass Cards */
     .glass-card {
-        background: var(--glass-bg);
-        backdrop-filter: blur(12px);
-        border: 1px solid var(--glass-border);
+        background: rgba(15, 25, 48, 0.4);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
         border-radius: 24px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .glass-card:hover {
         border-color: rgba(94, 102, 255, 0.3);
@@ -305,24 +305,23 @@ with st.sidebar:
 # --- CUSTOM HEADER ---
 with st.container():
     st.markdown(f"""
-    <div class="flex items-center justify-between px-24 py-6 bg-slate-950/50 backdrop-blur-md border-b border-white/5 sticky top-0 z-50" style="height: 80px;">
-        <div class="flex items-center gap-10">
-            <span class="text-xl font-headline font-extrabold tracking-tighter bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">RAG ANALYZER</span>
-            <div class="hidden md:flex gap-8">
-                <span class="text-sm font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">Portfolio</span>
-                <span class="text-sm font-medium text-primary border-b-2 border-primary pb-1">Intelligence</span>
-                <span class="text-sm font-medium text-slate-400 hover:text-white transition-colors cursor-pointer">Resources</span>
+    <div class="flex items-center justify-between px-8 py-4 bg-slate-950/40 backdrop-blur-2xl border-b border-white/5 sticky top-0 z-50" style="height: 70px;">
+        <div class="flex items-center gap-8">
+            <span class="text-lg font-headline font-black tracking-tighter bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">PRECISION AI</span>
+            <div class="hidden lg:flex gap-6 border-l border-white/10 pl-8">
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-primary transition-colors cursor-pointer">Intelligence Layer</span>
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-primary transition-colors cursor-pointer">Neural Engine</span>
             </div>
         </div>
         <div class="flex items-center gap-6">
-            <div class="flex items-center gap-3 bg-slate-900 px-4 py-2 rounded-2xl border border-white/5" style="border-radius: 12px; padding: 6px 12px;">
-                <span class="relative flex h-2 w-2" style="width: 8px; height: 8px;">
-                    <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+            <div class="flex items-center gap-3 bg-white/5 px-4 py-1.5 rounded-full border border-white/10">
+                <span class="relative flex h-1.5 w-1.5">
+                    <span class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary"></span>
                 </span>
-                <span class="text-[10px] uppercase tracking-widest text-primary-300 font-bold font-label" style="font-size: 10px;">{st.session_state.process_status}</span>
+                <span class="text-[10px] uppercase font-bold tracking-widest text-primary/80">{st.session_state.process_status}</span>
             </div>
-            <div class="rounded-full border-2 border-primary/20 p-0.5" style="width: 44px; height: 44px; border-radius: 50%; overflow: hidden;">
+            <div class="rounded-full border border-white/20 p-0.5 hover:border-primary/50 transition-all cursor-pointer shadow-lg shadow-black/40" style="width: 38px; height: 38px; border-radius: 50%; overflow: hidden;">
                 <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHg42IWLey4S15SqkykRxyXZ74kddwgq21vEX9uiG7QWnY_jlHlpQHBelnSrAMrvANaeXGQBJZ2qZn0f6kOOvLsoq7Q-cq379cmg6TdqL4rT_0XzNRWi4dIwrFilyDGKhr5yCyohoXL1xviVF5bUuRt8Yifxe-VxcnY4D8YLCtxxYVNw8POr7pS-0JH8PXge7dq7HkrecSoLkD56oNshJ_iv4w7kMyv3riQuGn5LZXVdB1-NXyu6BOa6vvncteixXZfnbw3ewfQKE" style="width: 100%; height: 100%; object-fit: cover;">
             </div>
         </div>
@@ -337,14 +336,17 @@ with st.container():
 # ==============================================================================
 if st.session_state.active_tab == "Retriever":
     st.markdown("""
-    <div class="space-y-12">
-        <div class="flex items-end justify-between">
-            <div class="space-y-3">
+    <div class="space-y-16 mt-10">
+        <div class="flex items-end justify-between border-b border-white/5 pb-12">
+            <div class="space-y-5">
                 <div class="flex items-center gap-3">
-                    <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold tracking-[0.2em] rounded-full uppercase">Ingestion Engine</span>
+                    <div class="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                        <span class="text-primary text-[9px] font-black tracking-[0.25em] uppercase">Ingestion Engine</span>
+                    </div>
                 </div>
-                <h1 class="text-5xl font-black font-headline tracking-tight text-white leading-tight">Knowledge Base</h1>
-                <p class="text-slate-400 text-lg max-w-2xl font-medium">Initialize your analysis by processing financial literature and institutional reports into the neural vector engine.</p>
+                <h1 class="text-6xl font-black font-headline tracking-tighter text-white leading-none">Knowledge Base</h1>
+                <p class="text-slate-400 text-lg max-w-2xl font-medium leading-relaxed">Initialize your analysis by processing financial literature and institutional reports into the neural vector engine.</p>
             </div>
         </div>
     """, unsafe_allow_html=True)
@@ -445,17 +447,20 @@ if st.session_state.active_tab == "Retriever":
 # ==============================================================================
 elif st.session_state.active_tab == "Verify DB":
     st.markdown("""
-    <div class="space-y-10">
-        <div class="flex items-end justify-between">
-            <div class="space-y-3">
+    <div class="space-y-16 mt-10">
+        <div class="flex items-end justify-between border-b border-white/5 pb-10">
+            <div class="space-y-5">
                 <div class="flex items-center gap-3">
-                    <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold tracking-[0.2em] rounded-full uppercase">Database Integrity</span>
+                    <div class="flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                        <span class="text-primary text-[9px] font-black tracking-[0.25em] uppercase">Database Integrity</span>
+                    </div>
                 </div>
-                <h1 class="text-5xl font-black font-headline tracking-tight text-white leading-tight">System Analytics</h1>
-                <p class="text-slate-400 text-lg max-w-2xl font-medium">Direct inspection of the latent document embeddings and partitioned knowledge chunks.</p>
+                <h1 class="text-6xl font-black font-headline tracking-tighter text-white leading-none">System Analytics</h1>
+                <p class="text-slate-400 text-lg max-w-2xl font-medium leading-relaxed">Direct inspection of the latent document embeddings and partitioned knowledge chunks.</p>
             </div>
             <div class="flex gap-3">
-                <div class="px-4 py-2 bg-slate-900 rounded-xl border border-white/5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">HuggingFace Optimized</div>
+                <div class="px-4 py-2 bg-slate-950/50 rounded-xl border border-white/10 text-[9px] font-black text-slate-500 uppercase tracking-widest leading-none">HuggingFace Optimized</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
@@ -536,13 +541,18 @@ elif st.session_state.active_tab == "Verify DB":
 # ==============================================================================
 elif st.session_state.active_tab == "Dashboard":
     st.markdown("""
-    <div class="space-y-10">
-        <div class="space-y-3">
-            <div class="flex items-center gap-3">
-                <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold tracking-[0.2em] rounded-full uppercase">Cognitive Layer</span>
+    <div class="space-y-16 mt-10">
+        <div class="flex items-end justify-between border-b border-white/5 pb-10">
+            <div class="space-y-5">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-emerald-500">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[9px] font-black tracking-[0.25em] uppercase">Cognitive Layer</span>
+                    </div>
+                </div>
+                <h1 class="text-6xl font-black font-headline tracking-tighter text-white leading-none">Intelligent Query</h1>
+                <p class="text-slate-400 text-lg max-w-2xl font-medium leading-relaxed">Probe the latent space of your ingested documents with precise, natural language inquiries.</p>
             </div>
-            <h1 class="text-5xl font-black font-headline tracking-tight text-white leading-tight">Intelligent Query</h1>
-            <p class="text-slate-400 text-lg max-w-2xl font-medium">Probe the latent space of your ingested documents with precise, natural language inquiries.</p>
         </div>
     """, unsafe_allow_html=True)
 
