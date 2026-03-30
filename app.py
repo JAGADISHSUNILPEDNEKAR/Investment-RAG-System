@@ -356,14 +356,21 @@ if st.session_state.active_tab == "Retriever":
 
 elif st.session_state.active_tab == "Verify DB":
     st.markdown("""
-    <div class="flex items-center justify-between mb-8">
-        <h2 class="text-2xl font-extrabold font-headline tracking-tight">Backend Verification</h2>
-        <div class="flex gap-2">
-            <span class="px-3 py-1 bg-[#192540] rounded-full text-[10px] font-label uppercase text-slate-400">Latent Space v2</span>
-            <span class="px-3 py-1 bg-[#192540] rounded-full text-[10px] font-label uppercase text-slate-400">HuggingFace Optimized</span>
+    <div class="space-y-10">
+        <div class="flex items-end justify-between">
+            <div class="space-y-3">
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold tracking-[0.2em] rounded-full uppercase">Database Integrity</span>
+                </div>
+                <h1 class="text-5xl font-black font-headline tracking-tight text-white leading-tight">System Analytics</h1>
+                <p class="text-slate-400 text-lg max-w-2xl font-medium">Direct inspection of the latent document embeddings and partitioned knowledge chunks.</p>
+            </div>
+            <div class="flex gap-3">
+                <div class="px-4 py-2 bg-slate-900 rounded-xl border border-white/5 text-[10px] font-bold text-slate-500 uppercase tracking-widest">HuggingFace Optimized</div>
+            </div>
         </div>
-    </div>
     """, unsafe_allow_html=True)
+    
     if os.path.exists(DB_DIR):
         try:
             db = chromadb.PersistentClient(path=DB_DIR)
@@ -374,18 +381,27 @@ elif st.session_state.active_tab == "Verify DB":
                 v_cols = st.columns(2, gap="large")
                 with v_cols[0]:
                     chunks_html = ""
-                    for doc in data['documents']:
-                        chunks_html += f'<div class="p-4 bg-[#0f1930] rounded-lg border-l-4 border-[#9fa7ff] text-sm text-[#a3aac4] shadow-sm italic leading-relaxed">"{doc[:220]}..."</div>'
+                    for i, doc in enumerate(data['documents']):
+                        chunks_html += f"""
+                        <div class="p-5 bg-slate-900/50 rounded-2xl border border-white/5 space-y-3 group hover:border-primary/30 transition-all">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-primary opacity-40 group-hover:opacity-100 transition-opacity"></span>
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Chunk {i+1}</span>
+                            </div>
+                            <p class="text-sm text-slate-400 italic leading-relaxed">"{doc[:240]}..."</p>
+                        </div>
+                        """
                     
                     st.markdown(f"""
-                    <div class="bg-[#091328] rounded-xl overflow-hidden border border-white/5 shadow-xl">
-                        <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-[#192540]/30">
-                            <span class="font-headline font-bold text-sm flex items-center gap-3">
-                                <span class="material-symbols-outlined text-[#7f8af6]">segment</span>
-                                Document Chunks ({len(data['documents'])})
+                    <div class="glass-card overflow-hidden">
+                        <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
+                            <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">segment</span>
+                                Knowledge Segments
                             </span>
+                            <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">{len(data['documents'])} Nodes</span>
                         </div>
-                        <div class="p-5 space-y-4">
+                        <div class="p-8 space-y-6">
                             {chunks_html}
                         </div>
                     </div>
@@ -393,24 +409,34 @@ elif st.session_state.active_tab == "Verify DB":
                 
                 with v_cols[1]:
                     embeddings_html = ""
-                    for emb in data['embeddings']:
-                        embeddings_html += f'<div class="p-4 bg-[#000000] rounded-lg border border-white/5 text-[#7f8af6]/80 break-all leading-tight font-mono text-[9px] shadow-inner">[{", ".join([f"{x:.2f}" for x in emb[:12]])}...]</div>'
+                    for i, emb in enumerate(data['embeddings']):
+                        embeddings_html += f"""
+                        <div class="p-5 bg-slate-950 rounded-2xl border border-white/5 space-y-3 group hover:border-primary/30 transition-all">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-primary-400 opacity-40 group-hover:opacity-100 transition-opacity"></span>
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Embedding {i+1}</span>
+                            </div>
+                            <p class="text-[9px] font-mono text-primary/60 break-all leading-tight">[{", ".join([f"{x:.3f}" for x in emb[:15]])}...]</p>
+                        </div>
+                        """
                     
                     st.markdown(f"""
-                    <div class="bg-[#091328] rounded-xl overflow-hidden border border-white/5 shadow-xl">
-                        <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-[#192540]/30">
-                            <span class="font-headline font-bold text-sm flex items-center gap-3">
-                                <span class="material-symbols-outlined text-[#c180ff]">grid_3x3</span>
-                                High-Dim Vectors (d=384)
+                    <div class="glass-card overflow-hidden">
+                        <div class="px-8 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
+                            <span class="font-headline font-bold text-lg text-white flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">analytics</span>
+                                Vector Embeddings
                             </span>
+                            <span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase tracking-widest">d=384</span>
                         </div>
-                        <div class="p-5 space-y-4">
+                        <div class="p-8 space-y-6">
                             {embeddings_html}
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
-        except Exception as e: st.error(f"Error: {e}")
-    else: st.info("Index not found.")
+        except Exception as e: st.error(f"Integrity check failed: {e}")
+    else: st.info("Intelligence core is offline. Please ingest documents to initialize the vector database.")
+    st.markdown("</div>", unsafe_allow_html=True)
 
 elif st.session_state.active_tab == "Dashboard":
     st.markdown("""
