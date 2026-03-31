@@ -477,11 +477,13 @@ if st.session_state.active_tab == "Retriever":
                                 if v is not None and isinstance(v, (str, int, float, bool))
                             }
 
-                        Chroma.from_documents(
-                            documents=splits,
-                            embedding=embeddings,
-                            persist_directory=DB_DIR
+                        client = chromadb.PersistentClient(path=DB_DIR)
+                        vs = Chroma(
+                            client=client,
+                            collection_name="langchain",
+                            embedding_function=embeddings,
                         )
+                        vs.add_documents(documents=splits)
                         st.session_state.process_status = "STABLE"
                         st.success("Knowledge Ingested Successfully")
                         st.rerun()
@@ -519,7 +521,8 @@ elif st.session_state.active_tab == "Verify DB":
             # collection name always matches what the ingestion pipeline creates.
             # Previously, raw chromadb.PersistentClient + list_collections() could
             # silently inspect the wrong collection or fail across chromadb versions.
-            vs         = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
+            client     = chromadb.PersistentClient(path=DB_DIR)
+            vs         = Chroma(client=client, collection_name="langchain", embedding_function=embeddings)
             collection = vs._collection
             data       = collection.get(include=["documents", "embeddings"], limit=3)
 
@@ -654,7 +657,8 @@ elif st.session_state.active_tab == "Dashboard":
         if st.button("Execute Neural Search", key="btn_q", type="primary", use_container_width=True):
             if q_in and os.path.exists(DB_DIR):
                 with st.spinner("Synthesizing Insights..."):
-                    vs    = Chroma(persist_directory=DB_DIR, embedding_function=embeddings)
+                    client = chromadb.PersistentClient(path=DB_DIR)
+                    vs    = Chroma(client=client, collection_name="langchain", embedding_function=embeddings)
                     chain = create_retrieval_chain(
                         vs.as_retriever(),
                         create_stuff_documents_chain(
