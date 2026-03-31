@@ -1,7 +1,3 @@
-import pysqlite3
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
 import streamlit as st
 import os
 import shutil
@@ -9,11 +5,10 @@ import tempfile
 import textwrap
 from dotenv import load_dotenv
 
-import chromadb
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_community.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
@@ -246,7 +241,7 @@ def get_llm():
     )
 
 embeddings = get_embeddings()
-DB_DIR = "./chroma_db"
+DB_DIR = "./faiss_db"
 
 if "active_tab" not in st.session_state:
     st.session_state.active_tab = "Retriever"
@@ -477,13 +472,11 @@ if st.session_state.active_tab == "Retriever":
                                 if v is not None and isinstance(v, (str, int, float, bool))
                             }
 
-                        client = chromadb.PersistentClient(path=DB_DIR)
-                        vs = Chroma(
-                            client=client,
-                            collection_name="langchain",
-                            embedding_function=embeddings,
+                        vs = FAISS.from_documents(
+                            documents=splits,
+                            embedding=embeddings,
                         )
-                        vs.add_documents(documents=splits)
+                        vs.save_local(DB_DIR)
                         st.session_state.process_status = "STABLE"
                         st.success("Knowledge Ingested Successfully")
                         st.rerun()
@@ -517,14 +510,13 @@ elif st.session_state.active_tab == "Verify DB":
 
     if os.path.exists(DB_DIR):
         try:
-            # FIX #6: Use LangChain's Chroma wrapper to access the collection so the
-            # collection name always matches what the ingestion pipeline creates.
-            # Previously, raw chromadb.PersistentClient + list_collections() could
-            # silently inspect the wrong collection or fail across chromadb versions.
-            client     = chromadb.PersistentClient(path=DB_DIR)
-            vs         = Chroma(client=client, collection_name="langchain", embedding_function=embeddings)
-            collection = vs._collection
-            data       = collection.get(include=["documents", "embeddings"], limit=3)
+            vs = FAISS.load_local(DB_DIR, embeddings, allow_dangerous_deserialization=True)
+            docstore_data = list(vs.docstore._dict.values())
+            # Build data structure compatible with display logic
+            data = {
+                "documents": [doc.page_content for doc in docstore_data[:3]],
+                "embeddings": [embeddings.embed_documents([doc.page_content for doc in docstore_data[:3]])][0],
+            }
 
             v_cols = st.columns(2, gap="large")
 
@@ -657,8 +649,7 @@ elif st.session_state.active_tab == "Dashboard":
         if st.button("Execute Neural Search", key="btn_q", type="primary", use_container_width=True):
             if q_in and os.path.exists(DB_DIR):
                 with st.spinner("Synthesizing Insights..."):
-                    client = chromadb.PersistentClient(path=DB_DIR)
-                    vs    = Chroma(client=client, collection_name="langchain", embedding_function=embeddings)
+                    vs    = FAISS.load_local(DB_DIR, embeddings, allow_dangerous_deserialization=True)
                     chain = create_retrieval_chain(
                         vs.as_retriever(),
                         create_stuff_documents_chain(
