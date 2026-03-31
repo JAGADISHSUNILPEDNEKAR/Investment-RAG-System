@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+import shutil
 import tempfile
 import textwrap
 from dotenv import load_dotenv
@@ -565,6 +566,39 @@ elif st.session_state.active_tab == "Verify DB":
 
         except Exception as e:
             st.error(f"Integrity check failed: {e}")
+
+        # --- Clear Database Button ---
+        st.markdown("""
+        <div style="margin-top: 48px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.05);">
+            <div class="flex items-center gap-3 mb-2">
+                <span class="material-symbols-outlined text-rose-400" style="font-size: 20px;">delete_forever</span>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Danger Zone</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        if "confirm_clear" not in st.session_state:
+            st.session_state.confirm_clear = False
+
+        if not st.session_state.confirm_clear:
+            if st.button("🗑️ Clear Knowledge Base", key="btn_clear_db", use_container_width=True):
+                st.session_state.confirm_clear = True
+                st.rerun()
+        else:
+            st.warning("⚠️ This will permanently delete all ingested documents and embeddings.")
+            c_cols = st.columns(2)
+            with c_cols[0]:
+                if st.button("✅ Yes, Clear Everything", key="btn_confirm_clear", type="primary", use_container_width=True):
+                    shutil.rmtree(DB_DIR, ignore_errors=True)
+                    st.session_state.process_status = "Ready"
+                    st.session_state.pop("ans", None)
+                    st.session_state.confirm_clear = False
+                    st.cache_resource.clear()
+                    st.rerun()
+            with c_cols[1]:
+                if st.button("❌ Cancel", key="btn_cancel_clear", use_container_width=True):
+                    st.session_state.confirm_clear = False
+                    st.rerun()
     else:
         st.info("Intelligence core is offline. Please ingest documents to initialize the vector database.")
 
