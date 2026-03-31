@@ -7,5 +7,6 @@ langchain-huggingface
 langchain-google-genai
 pypdf
 chromadb
+pysqlite3-binary
 sentence-transformers
 python-dotenv

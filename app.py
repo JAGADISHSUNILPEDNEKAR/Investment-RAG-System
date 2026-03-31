@@ -1,3 +1,7 @@
+import pysqlite3
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 import streamlit as st
 import os
 import shutil
@@ -464,6 +468,15 @@ if st.session_state.active_tab == "Retriever":
                         splits = RecursiveCharacterTextSplitter(
                             chunk_size=1000, chunk_overlap=200
                         ).split_documents(docs)
+
+                        # Sanitize metadata: ChromaDB rejects None values
+                        # and non-primitive types in metadata fields
+                        for doc in splits:
+                            doc.metadata = {
+                                k: v for k, v in doc.metadata.items()
+                                if v is not None and isinstance(v, (str, int, float, bool))
+                            }
+
                         Chroma.from_documents(
                             documents=splits,
                             embedding=embeddings,
